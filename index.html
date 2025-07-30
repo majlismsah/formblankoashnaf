@@ -6,27 +6,27 @@
   <title>Form Pre-Order Buku Asnaf</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-green-50 min-h-screen flex items-center justify-center px-4 py-8">
-  <div class="w-full max-w-xl bg-white shadow-xl rounded-2xl p-6 space-y-6">
-    <h1 class="text-2xl font-bold text-center text-green-800">Pre-Order Buku Asnaf</h1>
+<body class="bg-gradient-to-br from-emerald-50 to-white min-h-screen py-6">
+  <div class="max-w-xl mx-auto bg-white shadow-xl rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-center text-green-700 mb-6">Form Pre-Order Buku Asnaf</h1>
 
-    <form id="preOrderForm" class="space-y-4">
-      <!-- Nama Lengkap -->
+    <form id="preOrderForm" class="space-y-4" enctype="multipart/form-data">
+      <!-- Nama -->
       <div>
-        <label class="block mb-1 text-gray-700">Nama Lengkap (KTP)</label>
-        <input type="text" name="nama" required placeholder="Contoh: Ahmad Fulan" class="w-full p-2 border rounded-md text-gray-800" />
+        <label for="nama" class="block font-semibold mb-1">Nama Lengkap</label>
+        <input type="text" id="nama" name="nama" class="w-full border p-2 rounded-md text-gray-800" required />
       </div>
 
       <!-- Nomor WhatsApp -->
       <div>
-        <label class="block mb-1 text-gray-700">Nomor WhatsApp Aktif</label>
-        <input type="tel" name="nowa" required placeholder="Contoh: 6281234567890" pattern="^62[0-9]{9,}$" class="w-full p-2 border rounded-md text-gray-800" />
+        <label for="wa" class="block font-semibold mb-1">Nomor WhatsApp Aktif</label>
+        <input type="tel" id="wa" name="wa" class="w-full border p-2 rounded-md text-gray-800" placeholder="Contoh: 62812xxxx" required />
       </div>
 
       <!-- Majlis Wilayah -->
       <div>
-        <label class="block mb-1 text-gray-700">Wilayah Majlis</label>
-        <select name="majlis" required class="w-full p-2 border rounded-md text-gray-800 bg-white">
+        <label for="majlis" class="block font-semibold mb-1">Wilayah Majlis</label>
+        <select id="majlis" name="majlis" class="w-full border p-2 rounded-md text-gray-800 bg-white" required>
           <option value="" disabled selected class="text-gray-400">Pilih Wilayah Majlis</option>
           <option>Ar-Rahman</option>
           <option>Ar-Rohim</option>
@@ -42,90 +42,80 @@
 
       <!-- Foto Profil -->
       <div>
-        <label class="block mb-1 text-gray-700">Upload Foto Profil</label>
-        <label for="fotoProfil" class="block w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 text-center cursor-pointer hover:bg-gray-100">
-          Pilih Foto Profil
-        </label>
-        <input type="file" id="fotoProfil" name="fotoProfil" accept="image/*" required class="hidden" />
-        <p class="text-sm text-gray-500 mt-1">Ukuran maksimal 2MB. Format JPG/PNG.</p>
-      </div>
-
-      <!-- Infaq -->
-      <div>
-        <label class="block mb-1 text-gray-700">Infaq Wajib Pusat</label>
-        <input type="text" name="infaq" placeholder="Contoh: Rp 50.000" class="w-full p-2 border rounded-md text-gray-800" />
-        <p class="text-sm text-gray-500 mt-1">Infaq wajib setiap tanggal 28 setiap bulan.</p>
+        <label for="fotoProfil" class="block font-semibold mb-1">Upload Foto Profil</label>
+        <div class="flex items-center gap-4">
+          <label for="fotoProfil" class="cursor-pointer px-4 py-2 border rounded-md bg-white text-gray-800 hover:bg-gray-100">
+            Pilih Foto
+          </label>
+          <span id="fotoProfilLabel" class="text-sm text-gray-600">Belum dipilih</span>
+        </div>
+        <input type="file" id="fotoProfil" name="fotoProfil" accept="image/*" class="hidden" required />
       </div>
 
       <!-- Tombol Submit -->
       <div class="pt-4">
-        <button type="submit" class="w-full bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-800 transition">
-          Kirim Formulir Pre-Order
-        </button>
+        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition">Kirim Pre-Order</button>
       </div>
     </form>
-  </div>
 
-  <!-- Modal sukses -->
-  <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl text-center max-w-sm">
-      <h2 class="text-xl font-semibold text-green-700">Berhasil!</h2>
-      <p class="mt-2 text-gray-700">Formulir Anda berhasil dikirim.</p>
-      <button onclick="redirectToWA()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Hubungi Admin</button>
+    <!-- Modal Sukses -->
+    <div id="successModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded-lg text-center">
+        <h2 class="text-xl font-bold text-green-700 mb-4">Pre-Order Berhasil!</h2>
+        <p class="mb-4">Terima kasih telah memesan. Admin akan segera menghubungi Anda.</p>
+        <a href="https://wa.me/62816787977" class="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Hubungi Admin via WA</a>
+      </div>
     </div>
   </div>
 
   <script>
     const form = document.getElementById('preOrderForm');
-    const fotoProfilInput = document.getElementById('fotoProfil');
     const modal = document.getElementById('successModal');
+    const fotoInput = document.getElementById('fotoProfil');
+    const fotoLabel = document.getElementById('fotoProfilLabel');
 
-    form.addEventListener('submit', async function(e) {
+    fotoInput.addEventListener('change', () => {
+      const fileName = fotoInput.files[0]?.name || 'Belum dipilih';
+      fotoLabel.textContent = fileName;
+    });
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const formData = new FormData(form);
-      const file = fotoProfilInput.files[0];
 
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async function() {
-          const base64Foto = reader.result.split(',')[1];
-          const data = {
-            nama: formData.get('nama'),
-            nowa: formData.get('nowa'),
-            majlis: formData.get('majlis'),
-            infaq: formData.get('infaq'),
-            fotoProfil: base64Foto
-          };
+      const base64Foto = await toBase64(formData.get('fotoProfil'));
+      const payload = {
+        nama: formData.get('nama'),
+        wa: formData.get('wa'),
+        majlis: formData.get('majlis'),
+        fotoProfil: base64Foto,
+      };
 
-          try {
-            const response = await fetch('https://script.google.com/macros/s/AKfycbxMJLDP8bqk1teTDlhlWl2odJ_l3K4QZFkPzkU4wASvg9qtdHTu7o3XquwsDiclQj71/exec', {
-              method: 'POST',
-              body: JSON.stringify(data),
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbxMJLDP8bqk1teTDlhlWl2odJ_l3K4QZFkPzkU4wASvg9qtdHTu7o3XquwsDiclQj71/exec", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+        });
 
-            if (response.ok) {
-              modal.classList.remove('hidden');
-              form.reset();
-            } else {
-              alert('Gagal mengirim. Silakan coba lagi.');
-            }
-          } catch (err) {
-            console.error(err);
-            alert('Terjadi kesalahan. Coba lagi.');
-          }
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Harap upload foto profil.');
+        if (res.ok) {
+          modal.classList.remove('hidden');
+        } else {
+          alert('Gagal mengirim. Coba lagi.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan.');
       }
     });
 
-    function redirectToWA() {
-      window.location.href = 'https://wa.me/62816787977';
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
     }
   </script>
 </body>
