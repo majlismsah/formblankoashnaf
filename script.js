@@ -175,14 +175,16 @@ function changePhoto(prefix) {
 // Form handling
 function setupFormSubmissions() {
   handleFormSubmit('desktop', {
-    nama: "nama",
+    nama_ktp: "nama_ktp",
+    nama_sulthon: "nama_sulthon",
     no_wa: "no_wa",
     majlis: "majlis",
     fotoProfil: "croppedImageData"
   });
   
   handleFormSubmit('mobile', {
-    nama: "namaMobile",
+    nama_ktp: "namaKtpMobile",
+    nama_sulthon: "namaSulthonMobile",
     no_wa: "waMobile",
     majlis: "majlisMobile",
     fotoProfil: "mobileCroppedImageData"
@@ -199,7 +201,8 @@ function handleFormSubmit(prefix, fieldIds) {
     btn.textContent = "Mengirim...";
 
     const formData = {
-      nama: document.getElementById(fieldIds.nama).value,
+      nama_ktp: document.getElementById(fieldIds.nama_ktp).value,
+      nama_sulthon: document.getElementById(fieldIds.nama_sulthon).value,
       no_wa: document.getElementById(fieldIds.no_wa).value,
       majlis: document.getElementById(fieldIds.majlis).value,
       fotoProfil: document.getElementById(fieldIds.fotoProfil).value
@@ -220,7 +223,7 @@ function submitFormData(formData, btn, isMobile) {
   .then((res) => res.json())
   .then((data) => {
     if (data.result === "success") {
-      const waMessage = `Halo Admin, saya sudah submit data pre-order Buku Asnaf.\n\nNama: ${formData.nama}\nMajlis: ${formData.majlis}\n\nMohon dicek di Google Sheet. Terima kasih.`;
+      const waMessage = `Halo Admin, saya sudah submit data pre-order Buku Asnaf.\n\nNama KTP: ${formData.nama_ktp}\nNama Sulthon: ${formData.nama_sulthon}\nMajlis: ${formData.majlis}\n\nMohon dicek di Google Sheet. Terima kasih.`;
       const waURL = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
       window.location.href = waURL;
     } else {
