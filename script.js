@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-  SCRIPT_URL: "PASTE_YOUR_WEB_APP_URL_HERE",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwMGeS-DpzbnMSCIt29EJUCj9EN9bOrICod9YGz2NMW4YcWPkK1C7oeiWPEDaXJlWcE/exec",
   ADMIN_WA_NUMBER: "62816787977",
   MAX_FILE_SIZE: 5 * 1024 * 1024 // 5MB
 };
