@@ -2,7 +2,7 @@
 const CONFIG = {
   SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwq8B64gftUFebmggpvlqK5KnloKtrrKQJ0bjTb4PD8qnCaQOQsBoQ-wV2HK8OxyEhA/exec",
   ADMIN_WA_NUMBER: "62816787977",
-  MAX_FILE_SIZE: 5 * 1024 * 1024 // 5MB
+  MAX_FILE_SIZE: 5 * 1024 * 1024 // 10MB
 };
 
 // Initialize Cropper instances
