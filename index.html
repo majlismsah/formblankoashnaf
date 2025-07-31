@@ -184,14 +184,22 @@
     <div class="form-container p-10 hidden md:block">
       <form id="preorderForm">
         <h2 class="text-xl font-semibold text-center mb-6">Isi Form Pre-Order</h2>
+        
         <div class="mb-4">
-          <label for="nama" class="block mb-1 font-medium">Nama Sulthon</label>
-          <input type="text" id="nama" name="nama" placeholder="Contoh : AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
+          <label for="nama_ktp" class="block mb-1 font-medium">Nama KTP</label>
+          <input type="text" id="nama_ktp" name="nama_ktp" placeholder="Contoh : AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
         </div>
+        
+        <div class="mb-4">
+          <label for="nama_sulthon" class="block mb-1 font-medium">Nama Sulthon</label>
+          <input type="text" id="nama_sulthon" name="nama_sulthon" placeholder="Contoh: ABDULLAH" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
+        </div>
+        
         <div class="mb-4">
           <label for="no_wa" class="block mb-1 font-medium">No. WhatsApp</label>
           <input type="tel" id="no_wa" name="no_wa" placeholder="Contoh: 081234567890" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
         </div>
+        
         <div class="mb-4">
           <label for="majlis" class="block mb-1 font-medium">Majlis Wilayah</label>
           <select id="majlis" name="majlis" class="w-full p-3 rounded-md bg-gray-800 text-white" required>
@@ -284,13 +292,20 @@
     </div>
     <form id="preorderFormMobile">
       <div class="mb-4">
-        <label class="block font-medium mb-1 text-white" for="namaMobile">Nama Sulthon</label>
-        <input type="text" id="namaMobile" name="nama" placeholder="Contoh: AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-700 text-white" required />
+        <label class="block font-medium mb-1 text-white" for="namaKtpMobile">Nama KTP</label>
+        <input type="text" id="namaKtpMobile" name="nama_ktp" placeholder="Contoh: AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-700 text-white" required />
       </div>
+      
+      <div class="mb-4">
+        <label class="block font-medium mb-1 text-white" for="namaSulthonMobile">Nama Sulthon</label>
+        <input type="text" id="namaSulthonMobile" name="nama_sulthon" placeholder="Contoh: ABDULLAH" class="w-full p-3 rounded-md bg-gray-700 text-white" required />
+      </div>
+      
       <div class="mb-4">
         <label class="block font-medium mb-1 text-white" for="waMobile">No. WhatsApp</label>
         <input type="tel" id="waMobile" name="no_wa" class="w-full p-3 rounded-md bg-gray-700 text-white" placeholder="081234567890" required />
       </div>
+      
       <div class="mb-4">
         <label class="block font-medium mb-1 text-white" for="majlisMobile">Wilayah Majlis</label>
         <select id="majlisMobile" name="majlis" class="w-full p-3 rounded-md bg-gray-700 text-white" required>
@@ -373,225 +388,6 @@
 
   <!-- Cropper.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  
-  <script>
-    const SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL";
-    const nomorAdminWA = "62816787977";
-
-    // Desktop Cropper
-    let desktopCropper;
-    const desktopFileInput = document.getElementById('fileInput');
-    const desktopUploadSection = document.getElementById('uploadSection');
-    const desktopCropSection = document.getElementById('cropSection');
-    const desktopResultSection = document.getElementById('resultSection');
-    const desktopImagePreview = document.getElementById('imagePreview');
-    const desktopCroppedResult = document.getElementById('croppedResult');
-    const desktopCroppedImageData = document.getElementById('croppedImageData');
-
-    // Mobile Cropper
-    let mobileCropper;
-    const mobileFileInput = document.getElementById('mobileFileInput');
-    const mobileUploadSection = document.getElementById('mobileUploadSection');
-    const mobileCropSection = document.getElementById('mobileCropSection');
-    const mobileResultSection = document.getElementById('mobileResultSection');
-    const mobileImagePreview = document.getElementById('mobileImagePreview');
-    const mobileCroppedResult = document.getElementById('mobileCroppedResult');
-    const mobileCroppedImageData = document.getElementById('mobileCroppedImageData');
-
-    // Initialize Cropper for Desktop
-    if (desktopFileInput) {
-      initCropper(
-        desktopFileInput,
-        desktopUploadSection,
-        desktopCropSection,
-        desktopResultSection,
-        desktopImagePreview,
-        desktopCroppedResult,
-        desktopCroppedImageData,
-        'desktop'
-      );
-    }
-
-    // Initialize Cropper for Mobile
-    if (mobileFileInput) {
-      initCropper(
-        mobileFileInput,
-        mobileUploadSection,
-        mobileCropSection,
-        mobileResultSection,
-        mobileImagePreview,
-        mobileCroppedResult,
-        mobileCroppedImageData,
-        'mobile'
-      );
-    }
-
-    // Generic Cropper Initialization Function
-    function initCropper(fileInput, uploadSection, cropSection, resultSection, imagePreview, croppedResult, croppedImageData, prefix) {
-      let cropper;
-      
-      fileInput.addEventListener('change', function(e) {
-        const files = e.target.files;
-        
-        if (files && files.length > 0) {
-          const file = files[0];
-          
-          // Check file size (max 5MB)
-          if (file.size > 5 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Maksimal 5MB.');
-            return;
-          }
-          
-          // Check file type
-          if (!file.type.match('image.*')) {
-            alert('Hanya file gambar yang diperbolehkan!');
-            return;
-          }
-          
-          const reader = new FileReader();
-          
-          reader.onload = function(event) {
-            imagePreview.src = event.target.result;
-            
-            // Show crop section
-            uploadSection.classList.add('hidden');
-            cropSection.classList.remove('hidden');
-            
-            // Initialize cropper
-            if (cropper) {
-              cropper.destroy();
-            }
-            
-            cropper = new Cropper(imagePreview, {
-              aspectRatio: 1,
-              viewMode: 1,
-              autoCropArea: 0.8,
-              responsive: true,
-              guides: false
-            });
-            
-            // Set up buttons
-            document.getElementById(`${prefix}RotateLeft`).addEventListener('click', () => cropper.rotate(-90));
-            document.getElementById(`${prefix}RotateRight`).addEventListener('click', () => cropper.rotate(90));
-            document.getElementById(`${prefix}ResetCrop`).addEventListener('click', () => cropper.reset());
-            
-            document.getElementById(`${prefix}CancelCrop`).addEventListener('click', function() {
-              cropSection.classList.add('hidden');
-              uploadSection.classList.remove('hidden');
-              fileInput.value = '';
-            });
-            
-            document.getElementById(`${prefix}SaveCrop`).addEventListener('click', function() {
-              const canvas = cropper.getCroppedCanvas({
-                width: 500,
-                height: 500,
-                minWidth: 256,
-                minHeight: 256,
-                maxWidth: 2000,
-                maxHeight: 2000,
-                fillColor: '#fff',
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high',
-              });
-              
-              canvas.toBlob(function(blob) {
-                const url = URL.createObjectURL(blob);
-                croppedResult.innerHTML = `<img src="${url}" class="cropped-preview">`;
-                croppedImageData.value = canvas.toDataURL('image/jpeg');
-                
-                cropSection.classList.add('hidden');
-                resultSection.classList.remove('hidden');
-              }, 'image/jpeg', 0.9);
-            });
-            
-            document.getElementById(`${prefix}ChangePhoto`).addEventListener('click', function() {
-              resultSection.classList.add('hidden');
-              uploadSection.classList.remove('hidden');
-              fileInput.value = '';
-            });
-          };
-          
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-
-    // Bottom Sheet Functionality
-    function toggleSheet(show) {
-      const sheet = document.getElementById("sheet");
-      const overlay = document.getElementById("sheetOverlay");
-      
-      if (show) {
-        sheet.classList.remove("hidden");
-        overlay.classList.add("active");
-        setTimeout(() => {
-          sheet.classList.add("show");
-        }, 10);
-      } else {
-        sheet.classList.remove("show");
-        overlay.classList.remove("active");
-        setTimeout(() => {
-          sheet.classList.add("hidden");
-        }, 300);
-      }
-    }
-
-    // Form Submission
-    function handleFormSubmit(formEl, inputIds) {
-      formEl.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const btn = formEl.querySelector("button");
-        btn.disabled = true;
-        btn.textContent = "Mengirim...";
-
-        const formData = new FormData(formEl);
-        fetch(SCRIPT_URL, {
-          method: "POST",
-          body: formData,
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.result === "success") {
-            const nama = document.getElementById(inputIds.nama).value;
-            const majlis = document.getElementById(inputIds.majlis).value;
-            const pesan = `Halo Admin, saya sudah submit data pre-order Buku Asnaf.\n\nNama: ${nama}\nMajlis: ${majlis}\n\nMohon dicek di Google Sheet. Terima kasih.`;
-            const waURL = `https://wa.me/${nomorAdminWA}?text=${encodeURIComponent(pesan)}`;
-            window.location.href = waURL;
-          } else {
-            alert("❌ Gagal terkirim!");
-            btn.disabled = false;
-            btn.textContent = inputIds.nama === "namaMobile" ? "Kirim & Konfirmasi via WA ke Admin" : "Kirim & Konfirmasi via WA";
-          }
-        })
-        .catch((err) => {
-          alert("❌ Terjadi kesalahan");
-          btn.disabled = false;
-          btn.textContent = inputIds.nama === "namaMobile" ? "Kirim & Konfirmasi via WA ke Admin" : "Kirim & Konfirmasi via WA";
-        });
-      });
-    }
-
-    // Format nomor WhatsApp
-    document.querySelectorAll('input[type="tel"]').forEach((waInput) => {
-      waInput.addEventListener('blur', () => {
-        let val = waInput.value.trim();
-        val = val.replace(/^(\+62|62|0)/, '62');
-        waInput.value = val;
-      });
-    });
-
-    // Initialize forms
-    document.addEventListener('DOMContentLoaded', function() {
-      handleFormSubmit(document.getElementById("preorderForm"), {
-        nama: "nama",
-        majlis: "majlis"
-      });
-
-      handleFormSubmit(document.getElementById("preorderFormMobile"), {
-        nama: "namaMobile",
-        majlis: "majlisMobile"
-      });
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
