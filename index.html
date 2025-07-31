@@ -192,16 +192,17 @@
         <label class="block font-medium mb-1 text-gray-700" for="fotoMobile">Upload Foto Profil</label>
         <input type="file" id="fotoMobile" name="fotoProfil" accept="image/*" class="w-full border rounded-md p-3 bg-gray-100" required />
       </div>
-      <button type="submit" class="bg-teal-500 hover:bg-teal-600 w-full text-white py-3 rounded-md font-bold">Kirim & Konfirmasi via WA</button>
+      <button type="submit" class="bg-teal-500 hover:bg-teal-600 w-full text-white py-3 rounded-md font-bold">Kirim & Konfirmasi via WA ke Admin</button>
     </form>
   </div>
 
   <script>
     const SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL"; // GANTI dengan URL Web App kamu
-    const nomorAdminWA = "6281234567890"; // GANTI dengan nomor admin WA sebenarnya
+    const nomorAdminWA = "62816787977"; // GANTI dengan nomor admin WA sebenarnya
 
     function toggleSheet(show) {
       const sheet = document.getElementById("sheet");
+      console.log("ToggleSheet:", show); // 
       if (show) {
         sheet.classList.remove("hidden");
         requestAnimationFrame(() => {
