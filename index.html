@@ -143,23 +143,24 @@
       max-width: 100%;
       margin: 0 auto;
     }
-    .cropper-modal {
-      background: rgba(0, 0, 0, 0.5);
+    .cropper-view-box, .cropper-face {
+      border-radius: 50%;
     }
-    #imagePreview {
+    #imagePreview, #mobileImagePreview {
       max-height: 400px;
     }
-    #croppedResult img {
-      max-width: 100%;
+    .cropped-preview {
+      max-width: 150px;
       border-radius: 8px;
+      margin: 10px auto;
     }
 
     @media (max-width: 640px) {
+      #imagePreview, #mobileImagePreview {
+        max-height: 300px;
+      }
       .cropper-container {
         max-width: 100%;
-      }
-      #imagePreview {
-        max-height: 300px;
       }
     }
   </style>
@@ -207,7 +208,7 @@
           </select>
         </div>
         
-        <!-- Upload Foto dengan Crop -->
+        <!-- Upload Foto dengan Crop (Desktop) -->
         <div class="mb-6">
           <label class="block mb-2 font-medium">Foto Profil Jamaah</label>
           
@@ -225,7 +226,7 @@
             </label>
           </div>
           
-          <!-- Cropper Section (Initially Hidden) -->
+          <!-- Cropper Section -->
           <div id="cropSection" class="hidden">
             <div class="mb-4">
               <div class="cropper-container">
@@ -257,10 +258,9 @@
           
           <!-- Result Section -->
           <div id="resultSection" class="hidden mt-4">
-            <h3 class="font-medium text-gray-300 mb-2">Hasil Crop:</h3>
-            <div id="croppedResult" class="mb-4 border border-gray-700 rounded-md p-2"></div>
+            <div id="croppedResult" class="mb-2"></div>
             <input type="hidden" id="croppedImageData" name="fotoProfil">
-            <button id="changePhoto" type="button" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600">
+            <button id="changePhoto" type="button" class="text-sm text-teal-400 hover:underline">
               Ganti Foto
             </button>
           </div>
@@ -276,7 +276,7 @@
   <!-- Overlay untuk bottom sheet -->
   <div id="sheetOverlay" class="sheet-overlay" onclick="toggleSheet(false)"></div>
 
-  <!-- Bottom Sheet Form (HP) -->
+  <!-- Bottom Sheet Form (Mobile) -->
   <div id="sheet" class="hidden">
     <div class="text-center mb-4">
       <h2 class="text-xl font-bold text-white">Form Pre-Order Buku Asnaf</h2>
@@ -306,35 +306,130 @@
           <option value="Barakotaul Anbiya">Barakotaul Anbiya</option>
         </select>
       </div>
+      
+      <!-- Upload Foto dengan Crop (Mobile) -->
       <div class="mb-6">
-        <label class="block font-medium mb-1 text-white" for="fotoMobile">Upload Foto Profil</label>
-        <input type="file" id="fotoMobile" name="fotoProfil" accept="image/*" class="w-full p-3 rounded-md bg-gray-700 text-white" required />
+        <label class="block font-medium mb-1 text-white">Foto Profil Jamaah</label>
+        
+        <!-- Upload Area -->
+        <div id="mobileUploadSection">
+          <label class="flex flex-col items-center px-4 py-6 bg-gray-700 rounded-md border-2 border-dashed border-gray-600 cursor-pointer hover:border-teal-500 mb-4">
+            <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <p class="text-sm text-gray-400">
+              <span class="font-semibold text-teal-400">Klik untuk upload</span>
+            </p>
+            <p class="text-xs text-gray-500 mt-1">JPEG atau PNG (Maks. 5MB)</p>
+            <input type="file" id="mobileFileInput" accept="image/*" class="hidden" required>
+          </label>
+        </div>
+        
+        <!-- Cropper Section -->
+        <div id="mobileCropSection" class="hidden">
+          <div class="mb-4">
+            <div class="cropper-container">
+              <img id="mobileImagePreview" class="block max-w-full">
+            </div>
+          </div>
+          
+          <div class="flex space-x-2 mb-4">
+            <button id="mobileRotateLeft" type="button" class="px-3 py-1 bg-gray-600 text-white rounded">
+              ↺ Kiri
+            </button>
+            <button id="mobileRotateRight" type="button" class="px-3 py-1 bg-gray-600 text-white rounded">
+              ↻ Kanan
+            </button>
+            <button id="mobileResetCrop" type="button" class="px-3 py-1 bg-gray-600 text-white rounded">
+              ⟲ Reset
+            </button>
+          </div>
+          
+          <div class="flex justify-between">
+            <button id="mobileCancelCrop" type="button" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500">
+              Batal
+            </button>
+            <button id="mobileSaveCrop" type="button" class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">
+              Simpan
+            </button>
+          </div>
+        </div>
+        
+        <!-- Result Section -->
+        <div id="mobileResultSection" class="hidden mt-4">
+          <div id="mobileCroppedResult" class="mb-2"></div>
+          <input type="hidden" id="mobileCroppedImageData" name="fotoProfil">
+          <button id="mobileChangePhoto" type="button" class="text-sm text-teal-400 hover:underline">
+            Ganti Foto
+          </button>
+        </div>
       </div>
+      
       <button type="submit" class="bg-teal-500 hover:bg-teal-600 w-full text-white py-3 rounded-md font-bold shadow-lg border-2 border-teal-500 hover:border-teal-300 transition-all duration-300">
         Kirim & Konfirmasi via WA ke Admin
       </button>
     </form>
   </div>
 
-  <!-- Cropper.js and supporting libraries -->
+  <!-- Cropper.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   
   <script>
-    const SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL"; // GANTI dengan URL Web App kamu
-    const nomorAdminWA = "62816787977"; // GANTI dengan nomor admin WA sebenarnya
+    const SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL";
+    const nomorAdminWA = "62816787977";
 
-    // Cropper Functionality
-    let cropper;
-    const fileInput = document.getElementById('fileInput');
-    const uploadSection = document.getElementById('uploadSection');
-    const cropSection = document.getElementById('cropSection');
-    const resultSection = document.getElementById('resultSection');
-    const imagePreview = document.getElementById('imagePreview');
-    const croppedResult = document.getElementById('croppedResult');
-    const croppedImageData = document.getElementById('croppedImageData');
-    
-    // Initialize when file is selected
-    if (fileInput) {
+    // Desktop Cropper
+    let desktopCropper;
+    const desktopFileInput = document.getElementById('fileInput');
+    const desktopUploadSection = document.getElementById('uploadSection');
+    const desktopCropSection = document.getElementById('cropSection');
+    const desktopResultSection = document.getElementById('resultSection');
+    const desktopImagePreview = document.getElementById('imagePreview');
+    const desktopCroppedResult = document.getElementById('croppedResult');
+    const desktopCroppedImageData = document.getElementById('croppedImageData');
+
+    // Mobile Cropper
+    let mobileCropper;
+    const mobileFileInput = document.getElementById('mobileFileInput');
+    const mobileUploadSection = document.getElementById('mobileUploadSection');
+    const mobileCropSection = document.getElementById('mobileCropSection');
+    const mobileResultSection = document.getElementById('mobileResultSection');
+    const mobileImagePreview = document.getElementById('mobileImagePreview');
+    const mobileCroppedResult = document.getElementById('mobileCroppedResult');
+    const mobileCroppedImageData = document.getElementById('mobileCroppedImageData');
+
+    // Initialize Cropper for Desktop
+    if (desktopFileInput) {
+      initCropper(
+        desktopFileInput,
+        desktopUploadSection,
+        desktopCropSection,
+        desktopResultSection,
+        desktopImagePreview,
+        desktopCroppedResult,
+        desktopCroppedImageData,
+        'desktop'
+      );
+    }
+
+    // Initialize Cropper for Mobile
+    if (mobileFileInput) {
+      initCropper(
+        mobileFileInput,
+        mobileUploadSection,
+        mobileCropSection,
+        mobileResultSection,
+        mobileImagePreview,
+        mobileCroppedResult,
+        mobileCroppedImageData,
+        'mobile'
+      );
+    }
+
+    // Generic Cropper Initialization Function
+    function initCropper(fileInput, uploadSection, cropSection, resultSection, imagePreview, croppedResult, croppedImageData, prefix) {
+      let cropper;
+      
       fileInput.addEventListener('change', function(e) {
         const files = e.target.files;
         
@@ -368,73 +463,56 @@
             }
             
             cropper = new Cropper(imagePreview, {
-              aspectRatio: 1, // 1:1 ratio (square)
+              aspectRatio: 1,
               viewMode: 1,
               autoCropArea: 0.8,
               responsive: true,
               guides: false
             });
+            
+            // Set up buttons
+            document.getElementById(`${prefix}RotateLeft`).addEventListener('click', () => cropper.rotate(-90));
+            document.getElementById(`${prefix}RotateRight`).addEventListener('click', () => cropper.rotate(90));
+            document.getElementById(`${prefix}ResetCrop`).addEventListener('click', () => cropper.reset());
+            
+            document.getElementById(`${prefix}CancelCrop`).addEventListener('click', function() {
+              cropSection.classList.add('hidden');
+              uploadSection.classList.remove('hidden');
+              fileInput.value = '';
+            });
+            
+            document.getElementById(`${prefix}SaveCrop`).addEventListener('click', function() {
+              const canvas = cropper.getCroppedCanvas({
+                width: 500,
+                height: 500,
+                minWidth: 256,
+                minHeight: 256,
+                maxWidth: 2000,
+                maxHeight: 2000,
+                fillColor: '#fff',
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+              });
+              
+              canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                croppedResult.innerHTML = `<img src="${url}" class="cropped-preview">`;
+                croppedImageData.value = canvas.toDataURL('image/jpeg');
+                
+                cropSection.classList.add('hidden');
+                resultSection.classList.remove('hidden');
+              }, 'image/jpeg', 0.9);
+            });
+            
+            document.getElementById(`${prefix}ChangePhoto`).addEventListener('click', function() {
+              resultSection.classList.add('hidden');
+              uploadSection.classList.remove('hidden');
+              fileInput.value = '';
+            });
           };
           
           reader.readAsDataURL(file);
         }
-      });
-      
-      // Rotate buttons
-      document.getElementById('rotateLeft').addEventListener('click', function() {
-        cropper.rotate(-90);
-      });
-      
-      document.getElementById('rotateRight').addEventListener('click', function() {
-        cropper.rotate(90);
-      });
-      
-      // Reset button
-      document.getElementById('resetCrop').addEventListener('click', function() {
-        cropper.reset();
-      });
-      
-      // Cancel button
-      document.getElementById('cancelCrop').addEventListener('click', function() {
-        cropSection.classList.add('hidden');
-        uploadSection.classList.remove('hidden');
-        fileInput.value = '';
-      });
-      
-      // Save button
-      document.getElementById('saveCrop').addEventListener('click', function() {
-        // Get cropped canvas
-        const canvas = cropper.getCroppedCanvas({
-          width: 500,
-          height: 500,
-          minWidth: 256,
-          minHeight: 256,
-          maxWidth: 2000,
-          maxHeight: 2000,
-          fillColor: '#fff',
-          imageSmoothingEnabled: true,
-          imageSmoothingQuality: 'high',
-        });
-        
-        // Convert to blob and display
-        canvas.toBlob(function(blob) {
-          const url = URL.createObjectURL(blob);
-          
-          // Display result
-          croppedResult.innerHTML = `<img src="${url}" class="max-w-full rounded-md">`;
-          croppedImageData.value = canvas.toDataURL('image/jpeg');
-          
-          // Show result section
-          cropSection.classList.add('hidden');
-          resultSection.classList.remove('hidden');
-        }, 'image/jpeg', 0.9); // 90% quality
-      });
-      
-      // Change photo button
-      document.getElementById('changePhoto').addEventListener('click', function() {
-        resultSection.classList.add('hidden');
-        uploadSection.classList.remove('hidden');
-        fileInput.value = '';
       });
     }
 
@@ -493,7 +571,7 @@
       });
     }
 
-    // Format otomatis untuk no_wa di desktop & mobile
+    // Format nomor WhatsApp
     document.querySelectorAll('input[type="tel"]').forEach((waInput) => {
       waInput.addEventListener('blur', () => {
         let val = waInput.value.trim();
@@ -502,7 +580,7 @@
       });
     });
 
-    // Inisialisasi form
+    // Initialize forms
     document.addEventListener('DOMContentLoaded', function() {
       handleFormSubmit(document.getElementById("preorderForm"), {
         nama: "nama",
