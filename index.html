@@ -2,7 +2,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<!-- HTML FINAL -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -73,17 +72,17 @@
       transition: all 0.3s ease;
     }
 
-     #sheet input,
+    #sheet input,
     #sheet select {
-      background-color: #2d3748; /* abu gelap */
+      background-color: #2d3748;
       color: #fff;
     }
-    
+
     #sheet input::placeholder,
     #sheet select option[disabled] {
-      color: #a0aec0; /* abu muda */
+      color: #a0aec0;
     }
-    
+
     input:focus, select:focus {
       border-color: #38b2ac;
       box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.3);
@@ -112,13 +111,13 @@
   <div class="container">
     <div class="book-info p-10 flex flex-col justify-center">
       <h1 class="text-3xl font-bold mb-4">📘 Pre-Order <span class="text-teal-400">Buku Asnaf</span></h1>
-      <p class="text-white/80 mb-6">Buku eksklusif untuk pencatatan asnaf jamaah. Desain elegan, siap digunakan oleh seluruh wilayah majlis.</p>
+      <p class="text-white/80 mb-6">Buku eksklusif untuk pencatatan ASHNAF jamaah. Desain elegan, siap digunakan oleh seluruh Jamaah MSAH.</p>
       <div class="book-mockup bg-gray-800 aspect-[3/4] max-w-xs mx-auto flex items-center justify-center rounded-md">
         <img src="https://github.com/majlismsah/formblankoashnaf/blob/main/imgfoto.png" class="w-full h-full object-cover" />
       </div>
       <div class="block md:hidden text-center mt-8">
         <button onclick="toggleSheet(true)" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition">
-          ✍️ Isi Formulir Pre-Order
+          👉 Klik untuk isi Formulir Pre-Order
         </button>
       </div>
     </div>
@@ -129,7 +128,7 @@
         <h2 class="text-xl font-semibold text-center mb-6">Isi Form Pre-Order</h2>
         <div class="mb-4">
           <label for="nama" class="block mb-1 font-medium">Nama Sulthon</label>
-          <input type="text" id="nama" name="nama" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
+          <input type="text" id="nama" name="nama" placeholder="Contoh : AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
         </div>
         <div class="mb-4">
           <label for="no_wa" class="block mb-1 font-medium">No. WhatsApp</label>
@@ -198,8 +197,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL";
-    const nomorAdminWA = "6281234567890";
+    const SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL"; // GANTI dengan URL Web App kamu
+    const nomorAdminWA = "6281234567890"; // GANTI dengan nomor admin WA sebenarnya
 
     function toggleSheet(show) {
       const sheet = document.getElementById("sheet");
@@ -256,6 +255,15 @@
     handleFormSubmit(document.getElementById("preorderFormMobile"), {
       nama: "namaMobile",
       majlis: "majlisMobile"
+    });
+
+    // Format otomatis untuk no_wa di desktop & mobile
+    document.querySelectorAll('input[name="no_wa"]').forEach((waInput) => {
+      waInput.addEventListener('blur', () => {
+        let val = waInput.value.trim();
+        val = val.replace(/^(\+62|62|0)/, '62');
+        waInput.value = val;
+      });
     });
   </script>
 </body>
