@@ -155,6 +155,16 @@
       margin: 10px auto;
     }
 
+    .logo {
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.15));
+    }
+
     @media (max-width: 640px) {
       #imagePreview, #mobileImagePreview {
         max-height: 300px;
@@ -162,13 +172,23 @@
       .cropper-container {
         max-width: 100%;
       }
+      .logo-container img {
+        width: 80px;
+        height: 80px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Bagian Book Info dengan Logo -->
     <div class="book-info p-10 flex flex-col justify-center">
-      <h1 class="text-3xl font-bold mb-4">📘 Pre-Order <span class="text-teal-400">Buku Asnaf</span></h1>
+      <div class="logo-container text-center mb-6">
+        <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/logo.png" 
+             alt="Logo MSAH" 
+             class="logo w-28 h-28 mx-auto rounded-full object-cover border-[3px] border-teal-400/80 shadow-xl hover:border-teal-300">
+        <h1 class="text-3xl font-bold mt-4">📘 Pre-Order <span class="text-teal-400">Buku Asnaf</span></h1>
+      </div>
       <p class="text-white/80 mb-6">Buku eksklusif untuk pencatatan ASHNAF jamaah. Desain elegan, siap digunakan oleh seluruh Jamaah MSAH.</p>
       <div class="book-mockup bg-gray-800 aspect-[3/4] max-w-xs mx-auto flex items-center justify-center rounded-md">
         <img src="https://via.placeholder.com/300x400" alt="Cover Buku Asnaf" class="w-full h-full object-cover" />
@@ -287,6 +307,9 @@
   <!-- Bottom Sheet Form (Mobile) -->
   <div id="sheet" class="hidden">
     <div class="text-center mb-4">
+      <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/logo.png" 
+           alt="Logo MSAH" 
+           class="w-20 h-20 mx-auto rounded-full mb-2 border-2 border-teal-400">
       <h2 class="text-xl font-bold text-white">Form Pre-Order Buku Asnaf</h2>
       <button onclick="toggleSheet(false)" class="text-sm text-gray-300 mt-1 hover:underline">Tutup</button>
     </div>
