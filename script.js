@@ -2,7 +2,7 @@
 const CONFIG = {
   SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyHl8kYNmbqzq14jZlDt0Krz7XBUzZJKV3oYZqei6V_DkyWOvuKxjsALOknFHWYWrqb/exec",
   ADMIN_WA_NUMBER: "62816787977",
-  MAX_FILE_SIZE: 5 * 1024 * 1024 // 10MB
+  MAX_FILE_SIZE: 5 * 1024 * 1024 // 5MB
 };
 
 // Initialize Cropper instances
@@ -97,7 +97,6 @@ function initCropper(prefix) {
       reader.readAsDataURL(file);
     }
   });
-
 
   // Rotate buttons
   el.rotateLeft.addEventListener('click', function() {
@@ -239,11 +238,15 @@ async function submitFormData(formData, btn, isMobile) {
     }
 
     const response = await fetch(CONFIG.SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nama_ktp: formData.nama_ktp,
+        nama_sulthon: formData.nama_sulthon,
+        no_wa: formData.no_wa,
+        majlis: formData.majlis,
+        fotoProfil: formData.fotoProfil
+      })
     });
     
     if (!response.ok) {
@@ -253,19 +256,17 @@ async function submitFormData(formData, btn, isMobile) {
     const data = await response.json();
     console.log('Server response:', data);
     
-    if (data.result === "success") {
-      // Hanya kirim teks, tanpa foto
+    if (data.status === "success") {
       const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n` +
                        `Nama KTP: ${formData.nama_ktp}\n` +
                        `Nama Sulthon: ${formData.nama_sulthon}\n` +
                        `No WA: ${formData.no_wa}\n` +
                        `Majlis: ${formData.majlis}\n\n` +
-                       `Foto bisa dilihat di: ${data.fotoUrl || 'Google Drive'}`;
+                       `Foto bisa dilihat di: ${data.data?.fotoUrl || 'Google Drive'}`;
     
-      // Buka WhatsApp dengan pesan pendek
       window.open(`https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`, '_blank');
       
-      // Reset form setelah berhasil
+      // Reset form
       if (isMobile) {
         elements.mobile.form.reset();
         elements.mobile.resultSection.classList.add('hidden');
@@ -291,14 +292,12 @@ async function submitFormData(formData, btn, isMobile) {
 function showError(btn, isMobile, errorMsg) {
   const errorMessage = errorMsg || 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.';
   
-  // Buat elemen error yang lebih baik
   const errorDiv = document.createElement('div');
   errorDiv.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg';
   errorDiv.textContent = `❌ ${errorMessage}`;
   
   document.body.appendChild(errorDiv);
   
-  // Hilangkan setelah 5 detik
   setTimeout(() => {
     errorDiv.remove();
   }, 5000);
@@ -310,7 +309,6 @@ function setupPhoneNumberFormatting() {
   phoneInputs.forEach(input => {
     if (input) {
       input.addEventListener('input', function(e) {
-        // Hanya biarkan angka dan hilangkan semua karakter non-digit
         this.value = this.value.replace(/[^0-9]/g, '');
       });
     }
