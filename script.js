@@ -248,18 +248,6 @@ async function submitFormData(formData, btn, isMobile) {
   document.body.appendChild(loadingPopup);
 
   try {
-    // Kode submit existing...
-    await fetch(...);
-
-    // Tutup popup loading setelah selesai
-    loadingPopup.remove();
-
-  } catch (error) {
-    loadingPopup.remove(); // Pastikan popup ditutup jika error
-    // Error handling existing...
-  }
-}
-  try {
     // 1. Prepare data for doPost
     const payload = {
       nama_ktp: formData.nama_ktp,
@@ -288,7 +276,7 @@ async function submitFormData(formData, btn, isMobile) {
                      `No WA: 62${payload.no_wa.replace(/^0/, '')}\n` + 
                      `Majlis: ${payload.majlis}`;
     
-    const waTab = window.open('', '_blank'); // Buka tab kosong dulu
+    const waTab = window.open('', '_blank');
     waTab.location.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
     
     // 5. Reset form
@@ -306,6 +294,7 @@ async function submitFormData(formData, btn, isMobile) {
     document.body.appendChild(errorDiv);
     setTimeout(() => errorDiv.remove(), 5000);
   } finally {
+    loadingPopup.remove();
     btn.disabled = false;
     btn.textContent = isMobile ? "Kirim & Konfirmasi via WA ke Admin" : "Kirim & Konfirmasi via WA";
   }
