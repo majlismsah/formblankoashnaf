@@ -1,14 +1,15 @@
-// Configuration
+// ========== CONFIGURATION ========== //
 const CONFIG = {
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyHl8kYNmbqzq14jZlDt0Krz7XBUzZJKV3oYZqei6V_DkyWOvuKxjsALOknFHWYWrqb/exec",
-  ADMIN_WA_NUMBER: "62816787977",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzUiB3eVCJu554W4HxwjdqpsPRjBUXx6pCJCEnInCO8tpV9HF3or-zfT9FgOijmsTJ8/exec",
+  ADMIN_WA: "62816787977",
+  SHEET_COLUMNS: ["Timestamp", "Nama KTP", "Nama Sulthon", "No WA", "Majlis", "Foto URL", "Status"],
   MAX_FILE_SIZE: 5 * 1024 * 1024 // 5MB
 };
 
-// Initialize Cropper instances
+// ========== GLOBAL VARIABLES ========== //
 let desktopCropper, mobileCropper;
 
-// DOM Elements
+// ========== DOM ELEMENTS ========== //
 const elements = {
   desktop: {
     form: document.getElementById('preorderForm'),
@@ -46,13 +47,14 @@ const elements = {
   sheetOverlay: document.getElementById('sheetOverlay')
 };
 
+// ========== MAIN INITIALIZATION ========== //
 function init() {
   setupCroppers();
   setupFormSubmissions();
   setupPhoneNumberFormatting();
 }
 
-// Cropper Functions
+// ========== CROPPER FUNCTIONS ========== //
 function setupCroppers() {
   initCropper('desktop');
   initCropper('mobile');
@@ -62,152 +64,95 @@ function initCropper(prefix) {
   const el = elements[prefix];
   
   el.fileInput.addEventListener('change', function(e) {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
+    if (!e.target.files?.length) return;
+    
+    const file = e.target.files[0];
+    if (file.size > CONFIG.MAX_FILE_SIZE) {
+      showAlert('Ukuran file terlalu besar. Maksimal 5MB', 'error');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      el.imagePreview.src = event.target.result;
+      el.uploadSection.classList.add('hidden');
+      el.cropSection.classList.remove('hidden');
       
-      if (file.size > CONFIG.MAX_FILE_SIZE) {
-        alert('Ukuran file terlalu besar. Maksimal 5MB');
-        return;
+      // Initialize cropper
+      if (prefix === 'desktop') {
+        desktopCropper = createCropper(el.imagePreview);
+      } else {
+        mobileCropper = createCropper(el.imagePreview);
       }
-      
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        el.imagePreview.src = event.target.result;
-        el.uploadSection.classList.add('hidden');
-        el.cropSection.classList.remove('hidden');
-        
-        if (prefix === 'desktop') {
-          desktopCropper = new Cropper(el.imagePreview, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 0.8,
-            responsive: true,
-            guides: false
-          });
-        } else {
-          mobileCropper = new Cropper(el.imagePreview, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 0.8,
-            responsive: true,
-            guides: false
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
   });
 
-  // Rotate buttons
-  el.rotateLeft.addEventListener('click', function() {
-    if (prefix === 'desktop') {
-      desktopCropper.rotate(-90);
-    } else {
-      mobileCropper.rotate(-90);
-    }
-  });
+  // Setup cropper controls
+  setupCropperControls(prefix);
+}
 
-  el.rotateRight.addEventListener('click', function() {
-    if (prefix === 'desktop') {
-      desktopCropper.rotate(90);
-    } else {
-      mobileCropper.rotate(90);
-    }
+function createCropper(imageElement) {
+  return new Cropper(imageElement, {
+    aspectRatio: 1,
+    viewMode: 1,
+    autoCropArea: 0.8,
+    responsive: true,
+    guides: false
   });
+}
 
-  // Reset button
-  el.resetCrop.addEventListener('click', function() {
-    if (prefix === 'desktop') {
-      desktopCropper.reset();
-    } else {
-      mobileCropper.reset();
-    }
-  });
+function setupCropperControls(prefix) {
+  const el = elements[prefix];
+  const cropper = prefix === 'desktop' ? desktopCropper : mobileCropper;
 
-  // Cancel button
-  el.cancelCrop.addEventListener('click', function() {
+  // Rotation controls
+  el.rotateLeft.addEventListener('click', () => cropper.rotate(-90));
+  el.rotateRight.addEventListener('click', () => cropper.rotate(90));
+  
+  // Reset control
+  el.resetCrop.addEventListener('click', () => cropper.reset());
+  
+  // Cancel control
+  el.cancelCrop.addEventListener('click', () => {
+    cropper.destroy();
     el.cropSection.classList.add('hidden');
     el.uploadSection.classList.remove('hidden');
     el.fileInput.value = '';
-    
-    if (prefix === 'desktop') {
-      desktopCropper.destroy();
-    } else {
-      mobileCropper.destroy();
-    }
   });
-
-  // Save button
-  el.saveCrop.addEventListener('click', function() {
-    let croppedCanvas;
-    if (prefix === 'desktop') {
-      croppedCanvas = desktopCropper.getCroppedCanvas({
-        width: 400,
-        height: 400,
-        minWidth: 256,
-        minHeight: 256,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        fillColor: '#fff',
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
-      });
-    } else {
-      croppedCanvas = mobileCropper.getCroppedCanvas({
-        width: 400,
-        height: 400,
-        minWidth: 256,
-        minHeight: 256,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        fillColor: '#fff',
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
-      });
-    }
+  
+  // Save control
+  el.saveCrop.addEventListener('click', () => {
+    const croppedCanvas = cropper.getCroppedCanvas({
+      width: 400,
+      height: 400,
+      fillColor: '#fff',
+      imageSmoothingQuality: 'high'
+    });
     
     const croppedImage = document.createElement('img');
-    croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 0.9);
+    croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 0.8);
     croppedImage.classList.add('cropped-preview');
     
     el.croppedResult.innerHTML = '';
     el.croppedResult.appendChild(croppedImage);
-    el.croppedImageData.value = croppedCanvas.toDataURL('image/jpeg', 0.9);
+    el.croppedImageData.value = croppedCanvas.toDataURL('image/jpeg', 0.8);
     
     el.cropSection.classList.add('hidden');
     el.resultSection.classList.remove('hidden');
   });
-
-  // Change photo button
-  el.changePhoto.addEventListener('click', function() {
+  
+  // Change photo control
+  el.changePhoto.addEventListener('click', () => {
     el.resultSection.classList.add('hidden');
     el.uploadSection.classList.remove('hidden');
     el.fileInput.value = '';
   });
 }
 
-// Form Handling
-function handleFormSubmit(prefix, fieldIds) {
-  const form = prefix === 'mobile' ? elements.mobile.form : elements.desktop.form;
-  const btn = form.querySelector('button[type="submit"]');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-      nama_ktp: document.getElementById(fieldIds.nama_ktp).value,
-      nama_sulthon: document.getElementById(fieldIds.nama_sulthon).value,
-      no_wa: document.getElementById(fieldIds.no_wa).value,
-      majlis: document.getElementById(fieldIds.majlis).value,
-      fotoProfil: document.getElementById(fieldIds.fotoProfil).value
-    };
-
-    await submitFormData(formData, btn, prefix === 'mobile');
-  });
-}
-
+// ========== FORM HANDLING ========== //
 function setupFormSubmissions() {
-  handleFormSubmit('desktop', {
+  setupForm('desktop', {
     nama_ktp: "nama_ktp",
     nama_sulthon: "nama_sulthon",
     no_wa: "no_wa",
@@ -215,7 +160,7 @@ function setupFormSubmissions() {
     fotoProfil: "croppedImageData"
   });
   
-  handleFormSubmit('mobile', {
+  setupForm('mobile', {
     nama_ktp: "namaKtpMobile",
     nama_sulthon: "namaSulthonMobile",
     no_wa: "waMobile",
@@ -224,111 +169,123 @@ function setupFormSubmissions() {
   });
 }
 
-async function submitFormData(formData, btn, isMobile) {
-  try {
-    // Validasi nomor WhatsApp
-    const waNumber = formData.no_wa.replace(/[^0-9]/g, '');
-    if (!waNumber.match(/^[0-9]{10,14}$/)) {
-      throw new Error('Nomor WhatsApp tidak valid');
-    }
-    
-    // Validasi foto profil
-    if (!formData.fotoProfil) {
-      throw new Error('Foto profil wajib diupload');
-    }
+function setupForm(prefix, fieldIds) {
+  const form = elements[prefix].form;
+  const btn = form.querySelector('button[type="submit"]');
 
-    const response = await fetch(CONFIG.SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nama_ktp: formData.nama_ktp,
-        nama_sulthon: formData.nama_sulthon,
-        no_wa: formData.no_wa,
-        majlis: formData.majlis,
-        fotoProfil: formData.fotoProfil
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    console.log('Server response:', data);
-    
-    if (data.status === "success") {
-      const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n` +
-                       `Nama KTP: ${formData.nama_ktp}\n` +
-                       `Nama Sulthon: ${formData.nama_sulthon}\n` +
-                       `No WA: ${formData.no_wa}\n` +
-                       `Majlis: ${formData.majlis}\n\n` +
-                       `Foto bisa dilihat di: ${data.data?.fotoUrl || 'Google Drive'}`;
-    
-      window.open(`https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`, '_blank');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = "Mengirim...";
+
+    try {
+      const formData = getFormData(form, fieldIds);
+      validateFormData(formData);
       
-      // Reset form
-      if (isMobile) {
-        elements.mobile.form.reset();
-        elements.mobile.resultSection.classList.add('hidden');
-        elements.mobile.uploadSection.classList.remove('hidden');
-      } else {
-        elements.desktop.form.reset();
-        elements.desktop.resultSection.classList.add('hidden');
-        elements.desktop.uploadSection.classList.remove('hidden');
-      }
-    } else {
-      throw new Error(data.message || 'Terjadi kesalahan server');
-    }
-  } catch (err) {
-    console.error('Submission error:', err);
-    showError(btn, isMobile, err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = isMobile ? "Kirim & Konfirmasi via WA ke Admin" : "Kirim & Konfirmasi via WA";
-  }
-}
-
-// Helper Functions
-function showError(btn, isMobile, errorMsg) {
-  const errorMessage = errorMsg || 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.';
-  
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg';
-  errorDiv.textContent = `❌ ${errorMessage}`;
-  
-  document.body.appendChild(errorDiv);
-  
-  setTimeout(() => {
-    errorDiv.remove();
-  }, 5000);
-}
-
-function setupPhoneNumberFormatting() {
-  const phoneInputs = [document.getElementById('no_wa'), document.getElementById('waMobile')];
-  
-  phoneInputs.forEach(input => {
-    if (input) {
-      input.addEventListener('input', function(e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
-      });
+      const response = await submitToGAS(formData);
+      handleSuccess(response, formData, prefix);
+    } catch (error) {
+      showAlert(`❌ ${error.message}`, 'error');
+      console.error("Error:", error);
+    } finally {
+      resetSubmitButton(btn, prefix);
     }
   });
 }
 
+function getFormData(form, fieldIds) {
+  return {
+    nama_ktp: form.querySelector(`#${fieldIds.nama_ktp}`).value.trim(),
+    nama_sulthon: form.querySelector(`#${fieldIds.nama_sulthon}`).value.trim(),
+    no_wa: formatPhoneNumber(form.querySelector(`#${fieldIds.no_wa}`).value),
+    majlis: form.querySelector(`#${fieldIds.majlis}`).value,
+    fotoProfil: form.querySelector(`#${fieldIds.fotoProfil}`).value
+  };
+}
+
+function validateFormData(data) {
+  if (!data.nama_ktp) throw new Error("Nama KTP wajib diisi");
+  if (!data.nama_sulthon) throw new Error("Nama Sulthon wajib diisi");
+  if (!data.no_wa.match(/^[0-9]{10,14}$/)) throw new Error("Nomor WhatsApp tidak valid");
+  if (!data.majlis) throw new Error("Majlis wajib dipilih");
+  if (!data.fotoProfil) throw new Error("Foto profil wajib diupload");
+}
+
+async function submitToGAS(data) {
+  const response = await fetch(CONFIG.SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  
+  if (!response.ok) throw new Error("Gagal terhubung ke server");
+  return await response.json();
+}
+
+function handleSuccess(response, formData, prefix) {
+  if (response.status !== "success") throw new Error(response.message);
+  
+  showAlert("✅ Data berhasil dikirim!", 'success');
+  resetForm(prefix);
+  sendWhatsAppConfirmation(formData, response.data?.fotoUrl);
+}
+
+function resetForm(prefix) {
+  const el = elements[prefix];
+  el.form.reset();
+  el.resultSection.classList.add('hidden');
+  el.uploadSection.classList.remove('hidden');
+  el.fileInput.value = '';
+}
+
+function sendWhatsAppConfirmation(data, fotoUrl) {
+  const message = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n` +
+                 `Nama KTP: ${data.nama_ktp}\n` +
+                 `Nama Sulthon: ${data.nama_sulthon}\n` +
+                 `No WA: ${data.no_wa}\n` +
+                 `Majlis: ${data.majlis}\n\n` +
+                 `Foto: ${fotoUrl || 'Lihat di Google Drive'}`;
+  
+  window.open(`https://wa.me/${CONFIG.ADMIN_WA}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+function resetSubmitButton(btn, prefix) {
+  btn.disabled = false;
+  btn.textContent = prefix === 'mobile' 
+    ? "Kirim & Konfirmasi via WA ke Admin" 
+    : "Kirim & Konfirmasi via WA";
+}
+
+// ========== UTILITY FUNCTIONS ========== //
+function setupPhoneNumberFormatting() {
+  document.querySelectorAll('[name="no_wa"], [name="waMobile"]').forEach(input => {
+    input.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);
+    });
+  });
+}
+
+function formatPhoneNumber(phone) {
+  const cleaned = phone.replace(/[^0-9]/g, '');
+  return cleaned.startsWith('0') ? '62' + cleaned.substring(1) : cleaned;
+}
+
+function showAlert(message, type = 'success') {
+  const alert = document.createElement('div');
+  alert.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  } text-white px-4 py-2 rounded-md shadow-lg z-50`;
+  alert.textContent = message;
+  document.body.appendChild(alert);
+  
+  setTimeout(() => alert.remove(), 5000);
+}
+
 function toggleSheet(show) {
-  if (show) {
-    elements.sheet.classList.remove('hidden');
-    elements.sheet.classList.add('show');
-    elements.sheetOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  } else {
-    elements.sheet.classList.remove('show');
-    elements.sheetOverlay.classList.remove('active');
-    setTimeout(() => {
-      elements.sheet.classList.add('hidden');
-    }, 300);
-    document.body.style.overflow = '';
-  }
+  elements.sheet.classList.toggle('hidden', !show);
+  elements.sheet.classList.toggle('show', show);
+  elements.sheetOverlay.classList.toggle('active', show);
+  document.body.style.overflow = show ? 'hidden' : '';
 }
 
 // Initialize
