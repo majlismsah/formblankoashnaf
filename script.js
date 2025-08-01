@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwq8B64gftUFebmggpvlqK5KnloKtrrKQJ0bjTb4PD8qnCaQOQsBoQ-wV2HK8OxyEhA/exec",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbz73lJ5u50Lz9pAOiSZt-1xnJ0OnIdYZr4nuUOi0RLbH42zV_vXvMRIBUP_RjuN95T0/exec",
   ADMIN_WA_NUMBER: "62816787977",
   MAX_FILE_SIZE: 5 * 1024 * 1024 // 10MB
 };
