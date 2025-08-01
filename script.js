@@ -45,7 +45,17 @@ const elements = {
   sheet: document.getElementById('sheet'),
   sheetOverlay: document.getElementById('sheetOverlay')
 };
-
+function toggleSheet(show) {
+  if (show) {
+    elements.sheet.classList.remove('hidden');
+    elements.sheet.classList.add('show');
+    elements.sheetOverlay.classList.add('active');
+  } else {
+    elements.sheet.classList.remove('show');
+    elements.sheetOverlay.classList.remove('active');
+    setTimeout(() => elements.sheet.classList.add('hidden'), 300);
+  }
+}
 function init() {
   setupCroppers();
   setupFormSubmissions();
@@ -329,22 +339,6 @@ function setupPhoneNumberFormatting() {
       });
     }
   });
-}
-
-function toggleSheet(show) {
-  if (show) {
-    elements.sheet.classList.remove('hidden');
-    elements.sheet.classList.add('show');
-    elements.sheetOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  } else {
-    elements.sheet.classList.remove('show');
-    elements.sheetOverlay.classList.remove('active');
-    setTimeout(() => {
-      elements.sheet.classList.add('hidden');
-    }, 300);
-    document.body.style.overflow = '';
-  }
 }
 
 // Initialize
