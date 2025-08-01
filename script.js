@@ -226,6 +226,29 @@ function setupFormSubmissions() {
 }
 
 async function submitFormData(formData, btn, isMobile) {
+  // Tampilkan popup loading
+  const loadingPopup = document.createElement('div');
+  loadingPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+  loadingPopup.innerHTML = `
+    <div class="bg-white p-6 rounded-lg max-w-sm">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500 mx-auto mb-4"></div>
+      <p class="text-center font-semibold">Silakan tunggu, data Anda sedang diproses...</p>
+    </div>
+  `;
+  document.body.appendChild(loadingPopup);
+
+  try {
+    // Kode submit existing...
+    await fetch(...);
+
+    // Tutup popup loading setelah selesai
+    loadingPopup.remove();
+
+  } catch (error) {
+    loadingPopup.remove(); // Pastikan popup ditutup jika error
+    // Error handling existing...
+  }
+}
   try {
     // 1. Prepare data for doPost
     const payload = {
