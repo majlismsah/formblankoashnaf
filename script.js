@@ -255,7 +255,8 @@ async function submitFormData(formData, btn, isMobile) {
                      `No WA: 62${payload.no_wa.replace(/^0/, '')}\n` + 
                      `Majlis: ${payload.majlis}`;
     
-    window.open(`https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`, '_blank');
+    const waTab = window.open('', '_blank'); // Buka tab kosong dulu
+    waTab.location.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
     
     // 5. Reset form
     const prefix = isMobile ? 'mobile' : 'desktop';
