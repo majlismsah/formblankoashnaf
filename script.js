@@ -236,49 +236,46 @@ function setupFormSubmissions() {
 }
 
 async function submitFormData(formData, btn, isMobile) {
-  // Tampilkan popup loading
+  // 1. Buat loading popup
   const loadingPopup = document.createElement('div');
-  loadingPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+  loadingPopup.className = 'loading-popup';
   loadingPopup.innerHTML = `
-    <div class="bg-white p-6 rounded-lg max-w-sm">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500 mx-auto mb-4"></div>
-      <p class="text-center font-semibold">Silakan tunggu, data Anda sedang diproses...</p>
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="font-semibold">Silakan tunggu, data sedang diproses...</p>
     </div>
   `;
+
+  // 2. Tampilkan loading dan disable tombol
+  btn.disabled = true;
   document.body.appendChild(loadingPopup);
+  document.body.style.overflow = 'hidden'; // Prevent scrolling
 
   try {
-    // 1. Prepare data for doPost
+    // 3. Kirim data ke Google Script
     const payload = {
       nama_ktp: formData.nama_ktp,
       nama_sulthon: formData.nama_sulthon,
-      no_wa: formData.no_wa.replace(/[^0-9]/g, ''), // Clean number
+      no_wa: formData.no_wa.replace(/[^0-9]/g, ''),
       majlis: formData.majlis,
-      foto_file: formData.fotoProfil.split(',')[1], // Extract base64
+      foto_file: formData.fotoProfil.split(',')[1],
       foto_file_type: 'image/jpeg',
       foto_file_name: `profile_${Date.now()}.jpg`
     };
 
-    // 2. Send to Google Apps Script
     const response = await fetch(CONFIG.SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(payload)
     });
 
-    // 3. Handle response
     if (!response.ok) throw new Error(await response.text());
-    
-    // 4. Show success and open WhatsApp
-    const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n` +
-                     `Nama KTP: ${payload.nama_ktp}\n` +
-                     `Nama Sulthon: ${payload.nama_sulthon}\n` +
-                     `No WA: 62${payload.no_wa.replace(/^0/, '')}\n` + 
-                     `Majlis: ${payload.majlis}`;
-    
+
+    // 4. Redirect ke WhatsApp jika sukses
+    const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\nNama KTP: ${payload.nama_ktp}\nNama Sulthon: ${payload.nama_sulthon}\nNo WA: 62${payload.no_wa.replace(/^0/, '')}\nMajlis: ${payload.majlis}`;
     const waTab = window.open('', '_blank');
     waTab.location.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
-    
+
     // 5. Reset form
     const prefix = isMobile ? 'mobile' : 'desktop';
     elements[prefix].form.reset();
@@ -294,7 +291,9 @@ async function submitFormData(formData, btn, isMobile) {
     document.body.appendChild(errorDiv);
     setTimeout(() => errorDiv.remove(), 5000);
   } finally {
+    // 6. Selalu hapus loading dan enable tombol
     loadingPopup.remove();
+    document.body.style.overflow = '';
     btn.disabled = false;
     btn.textContent = isMobile ? "Kirim & Konfirmasi via WA ke Admin" : "Kirim & Konfirmasi via WA";
   }
