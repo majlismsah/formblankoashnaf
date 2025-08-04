@@ -7,7 +7,6 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Cropper.js CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -22,7 +21,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999; /* Pastikan di atas semua elemen */
+      z-index: 9999;
     }
     
     .loading-content {
@@ -218,7 +217,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Bagian Book Info dengan Logo -->
     <div class="book-info p-10 flex flex-col justify-center">
       <div class="logo-container text-center mb-6">
         <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/logo.png" 
@@ -239,7 +237,6 @@
       </div>
     </div>
 
-    <!-- Form Desktop -->
     <div class="form-container p-10 hidden md:block">
       <form id="preorderForm">
         <h2 class="text-xl font-semibold text-center mb-6">Isi Form Pre-Order</h2>
@@ -275,11 +272,9 @@
           </select>
         </div>
         
-        <!-- Upload Foto dengan Crop (Desktop) -->
         <div class="mb-6">
           <label class="block mb-2 font-medium">Foto Profil Jamaah</label>
           
-          <!-- Upload Area -->
           <div id="uploadSection">
             <label class="flex flex-col items-center px-4 py-6 bg-gray-800 rounded-md border-2 border-dashed border-gray-700 cursor-pointer hover:border-teal-500 mb-4">
               <svg class="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +288,6 @@
             </label>
           </div>
           
-          <!-- Cropper Section -->
           <div id="cropSection" class="hidden">
             <div class="mb-4">
               <div class="cropper-container">
@@ -323,7 +317,6 @@
             </div>
           </div>
           
-          <!-- Result Section -->
           <div id="resultSection" class="hidden mt-4">
             <div id="croppedResult" class="mb-2"></div>
             <input type="hidden" id="croppedImageData" name="fotoProfil">
@@ -336,7 +329,7 @@
           <label class="flex items-start">
             <input 
               type="checkbox" 
-              id="confirmPayment" 
+              id="confirmPaymentDesktop" 
               required
               class="mt-1 mr-2 h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
             >
@@ -355,10 +348,8 @@
     </div>
   </div>
 
-  <!-- Overlay untuk bottom sheet -->
   <div id="sheetOverlay" class="sheet-overlay" onclick="toggleSheet(false)"></div>
 
-  <!-- Bottom Sheet Form (Mobile) -->
   <div id="sheet" class="hidden">
     <div class="text-center mb-4">
       <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/logo.png" 
@@ -399,11 +390,9 @@
         </select>
       </div>
       
-      <!-- Upload Foto dengan Crop (Mobile) -->
       <div class="mb-6">
         <label class="block font-medium mb-1 text-white">Foto Profil Jamaah</label>
         
-        <!-- Upload Area -->
         <div id="mobileUploadSection">
           <label class="flex flex-col items-center px-4 py-6 bg-gray-700 rounded-md border-2 border-dashed border-gray-600 cursor-pointer hover:border-teal-500 mb-4">
             <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,7 +406,6 @@
           </label>
         </div>
         
-        <!-- Cropper Section -->
         <div id="mobileCropSection" class="hidden">
           <div class="mb-4">
             <div class="cropper-container">
@@ -447,7 +435,6 @@
           </div>
         </div>
         
-        <!-- Result Section -->
         <div id="mobileResultSection" class="hidden mt-4">
           <div id="mobileCroppedResult" class="mb-2"></div>
           <input type="hidden" id="mobileCroppedImageData" name="fotoProfil">
@@ -460,7 +447,7 @@
         <label class="flex items-start">
           <input 
             type="checkbox" 
-            id="confirmPayment" 
+            id="confirmPaymentMobile" 
             required
             class="mt-1 mr-2 h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
           >
@@ -478,7 +465,26 @@
     </form>
   </div>
 
-  <!-- Cropper.js -->
+  <div id="loadingPopup" class="loading-popup" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="font-semibold text-teal-700">Data sedang diproses...</p>
+    </div>
+  </div>
+
+  <div id="successPopup" class="loading-popup" style="display: none;">
+    <div class="loading-content bg-white shadow-xl rounded-lg p-6 text-center">
+      <svg class="mx-auto w-16 h-16 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">Pendaftaran Sukses!</h3>
+      <p class="text-gray-600 mb-6">Terima kasih, data Anda telah berhasil dikirim. Silakan konfirmasi ke admin.</p>
+      <a id="whatsappButton" href="#" target="_blank" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-md transition-colors inline-block">
+        Konfirmasi ke Admin via WhatsApp
+      </a>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="script.js"></script>
 </body>
