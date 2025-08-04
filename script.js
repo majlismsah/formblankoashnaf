@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
   SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzUiB3eVCJu554W4HxwjdqpsPRjBUXx6pCJCEnInCO8tpV9HF3or-zfT9FgOijmsTJ8/exec",
-  ADMIN_WA_NUMBER: "6282114527948",
+  ADMIN_WA_NUMBER: "6282114527948", // Ganti dengan nomor WhatsApp admin yang benar
   MAX_FILE_SIZE: 5 * 1024 * 1024 // 10MB
 };
 
@@ -82,7 +82,6 @@ function initCropper(prefix) {
       
       if (file.size > CONFIG.MAX_FILE_SIZE) {
         alert('Ukuran file terlalu besar. Maksimal 5MB');
-        // Reset file input
         el.fileInput.value = '';
         return;
       }
