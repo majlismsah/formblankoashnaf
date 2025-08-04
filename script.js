@@ -24,7 +24,8 @@ const elements = {
     resetCrop: document.getElementById('resetCrop'),
     cancelCrop: document.getElementById('cancelCrop'),
     saveCrop: document.getElementById('saveCrop'),
-    changePhoto: document.getElementById('changePhoto')
+    changePhoto: document.getElementById('changePhoto'),
+    confirmPayment: document.getElementById('confirmPaymentDesktop')
   },
   mobile: {
     form: document.getElementById('preorderFormMobile'),
@@ -40,10 +41,14 @@ const elements = {
     resetCrop: document.getElementById('mobileResetCrop'),
     cancelCrop: document.getElementById('mobileCancelCrop'),
     saveCrop: document.getElementById('mobileSaveCrop'),
-    changePhoto: document.getElementById('mobileChangePhoto')
+    changePhoto: document.getElementById('mobileChangePhoto'),
+    confirmPayment: document.getElementById('confirmPaymentMobile')
   },
   sheet: document.getElementById('sheet'),
-  sheetOverlay: document.getElementById('sheetOverlay')
+  sheetOverlay: document.getElementById('sheetOverlay'),
+  loadingPopup: document.getElementById('loadingPopup'),
+  successPopup: document.getElementById('successPopup'),
+  whatsappButton: document.getElementById('whatsappButton')
 };
 function toggleSheet(show) {
   if (show) {
@@ -77,6 +82,8 @@ function initCropper(prefix) {
       
       if (file.size > CONFIG.MAX_FILE_SIZE) {
         alert('Ukuran file terlalu besar. Maksimal 5MB');
+        // Reset file input
+        el.fileInput.value = '';
         return;
       }
       
@@ -86,22 +93,21 @@ function initCropper(prefix) {
         el.uploadSection.classList.add('hidden');
         el.cropSection.classList.remove('hidden');
         
+        const cropperOptions = {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 0.8,
+          responsive: true,
+          guides: false,
+          background: false
+        };
+        
         if (prefix === 'desktop') {
-          desktopCropper = new Cropper(el.imagePreview, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 0.8,
-            responsive: true,
-            guides: false
-          });
+          if(desktopCropper) desktopCropper.destroy();
+          desktopCropper = new Cropper(el.imagePreview, cropperOptions);
         } else {
-          mobileCropper = new Cropper(el.imagePreview, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 0.8,
-            responsive: true,
-            guides: false
-          });
+          if(mobileCropper) mobileCropper.destroy();
+          mobileCropper = new Cropper(el.imagePreview, cropperOptions);
         }
       };
       reader.readAsDataURL(file);
@@ -111,71 +117,53 @@ function initCropper(prefix) {
 
   // Rotate buttons
   el.rotateLeft.addEventListener('click', function() {
-    if (prefix === 'desktop') {
+    if (prefix === 'desktop' && desktopCropper) {
       desktopCropper.rotate(-90);
-    } else {
+    } else if (prefix === 'mobile' && mobileCropper) {
       mobileCropper.rotate(-90);
     }
   });
 
   el.rotateRight.addEventListener('click', function() {
-    if (prefix === 'desktop') {
+    if (prefix === 'desktop' && desktopCropper) {
       desktopCropper.rotate(90);
-    } else {
+    } else if (prefix === 'mobile' && mobileCropper) {
       mobileCropper.rotate(90);
     }
   });
 
   // Reset button
   el.resetCrop.addEventListener('click', function() {
-    if (prefix === 'desktop') {
+    if (prefix === 'desktop' && desktopCropper) {
       desktopCropper.reset();
-    } else {
+    } else if (prefix === 'mobile' && mobileCropper) {
       mobileCropper.reset();
     }
   });
 
   // Cancel button
   el.cancelCrop.addEventListener('click', function() {
+    if (prefix === 'desktop' && desktopCropper) {
+      desktopCropper.destroy();
+    } else if (prefix === 'mobile' && mobileCropper) {
+      mobileCropper.destroy();
+    }
     el.cropSection.classList.add('hidden');
     el.uploadSection.classList.remove('hidden');
     el.fileInput.value = '';
-    
-    if (prefix === 'desktop') {
-      desktopCropper.destroy();
-    } else {
-      mobileCropper.destroy();
-    }
   });
 
   // Save button
   el.saveCrop.addEventListener('click', function() {
-    let croppedCanvas;
-    if (prefix === 'desktop') {
-      croppedCanvas = desktopCropper.getCroppedCanvas({
-        width: 400,
-        height: 400,
-        minWidth: 256,
-        minHeight: 256,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        fillColor: '#fff',
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
-      });
-    } else {
-      croppedCanvas = mobileCropper.getCroppedCanvas({
-        width: 400,
-        height: 400,
-        minWidth: 256,
-        minHeight: 256,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        fillColor: '#fff',
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
-      });
-    }
+    let cropperInstance = prefix === 'desktop' ? desktopCropper : mobileCropper;
+    if (!cropperInstance) return;
+    
+    const croppedCanvas = cropperInstance.getCroppedCanvas({
+      width: 400,
+      height: 400,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high',
+    });
     
     const croppedImage = document.createElement('img');
     croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 0.9);
@@ -199,7 +187,7 @@ function initCropper(prefix) {
 
 // Form Handling
 function handleFormSubmit(prefix, fieldIds) {
-  const form = prefix === 'mobile' ? elements.mobile.form : elements.desktop.form;
+  const form = elements[prefix].form;
   const btn = form.querySelector('button[type="submit"]');
 
   form.addEventListener('submit', async (e) => {
@@ -213,7 +201,7 @@ function handleFormSubmit(prefix, fieldIds) {
       fotoProfil: document.getElementById(fieldIds.fotoProfil).value
     };
 
-    await submitFormData(formData, btn, prefix === 'mobile');
+    await submitFormData(formData, btn, prefix);
   });
 }
 
@@ -235,24 +223,16 @@ function setupFormSubmissions() {
   });
 }
 
-async function submitFormData(formData, btn, isMobile) {
-  // 1. Buat loading popup
-  const loadingPopup = document.createElement('div');
-  loadingPopup.className = 'loading-popup';
-  loadingPopup.innerHTML = `
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <p class="font-semibold">Silakan tunggu, data sedang diproses...</p>
-    </div>
-  `;
-
-  // 2. Tampilkan loading dan disable tombol
+async function submitFormData(formData, btn, prefix) {
   btn.disabled = true;
-  document.body.appendChild(loadingPopup);
-  document.body.style.overflow = 'hidden'; // Prevent scrolling
+  const originalBtnText = btn.textContent;
+  btn.textContent = 'Memproses...';
+
+  // Tampilkan loading popup
+  elements.loadingPopup.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 
   try {
-    // 3. Kirim data ke Google Script
     const payload = {
       nama_ktp: formData.nama_ktp,
       nama_sulthon: formData.nama_sulthon,
@@ -271,49 +251,48 @@ async function submitFormData(formData, btn, isMobile) {
 
     if (!response.ok) throw new Error(await response.text());
 
-    // 4. Redirect ke WhatsApp jika sukses
-    const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\nNama KTP: ${payload.nama_ktp}\nNama Sulthon: ${payload.nama_sulthon}\nNo WA: 62${payload.no_wa.replace(/^0/, '')}\nMajlis: ${payload.majlis}`;
-    const waTab = window.open('', '_blank');
-    waTab.location.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+    // Sembunyikan loading popup
+    elements.loadingPopup.style.display = 'none';
+    
+    // Buat pesan WhatsApp
+    const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n*Nama KTP*: ${payload.nama_ktp}\n*Nama Sulthon*: ${payload.nama_sulthon}\n*No WA*: 62${payload.no_wa.replace(/^0/, '')}\n*Majlis*: ${payload.majlis}`;
+    
+    // Set tautan ke tombol konfirmasi di pop-up sukses
+    elements.whatsappButton.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
 
-    // 5. Reset form
-    const prefix = isMobile ? 'mobile' : 'desktop';
+    // Tampilkan pop-up sukses
+    elements.successPopup.style.display = 'flex';
+
+    // Reset form
     elements[prefix].form.reset();
     elements[prefix].resultSection.classList.add('hidden');
     elements[prefix].uploadSection.classList.remove('hidden');
     elements[prefix].fileInput.value = '';
 
+    // Sembunyikan bottom sheet jika ada
+    if(prefix === 'mobile') {
+      toggleSheet(false);
+    }
+
   } catch (error) {
     console.error('Error:', error);
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg';
-    errorDiv.textContent = `❌ ${error.message || 'Gagal mengirim data'}`;
-    document.body.appendChild(errorDiv);
-    setTimeout(() => errorDiv.remove(), 5000);
+    showError(error.message || 'Gagal mengirim data');
   } finally {
-    // 6. Selalu hapus loading dan enable tombol
-    loadingPopup.remove();
+    // Selalu hapus loading dan enable tombol
+    elements.loadingPopup.style.display = 'none';
     document.body.style.overflow = '';
     btn.disabled = false;
-    btn.textContent = isMobile ? "Kirim & Konfirmasi via WA ke Admin" : "Kirim & Konfirmasi via WA";
+    btn.textContent = originalBtnText;
   }
 }
 
 // Helper Functions
-function showError(btn, isMobile, errorMsg) {
-  const errorMessage = errorMsg || 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.';
-  
-  // Buat elemen error yang lebih baik
+function showError(errorMsg) {
   const errorDiv = document.createElement('div');
-  errorDiv.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg';
-  errorDiv.textContent = `❌ ${errorMessage}`;
-  
+  errorDiv.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-[10000]';
+  errorDiv.textContent = `❌ ${errorMsg}`;
   document.body.appendChild(errorDiv);
-  
-  // Hilangkan setelah 5 detik
-  setTimeout(() => {
-    errorDiv.remove();
-  }, 5000);
+  setTimeout(() => errorDiv.remove(), 5000);
 }
 
 function setupPhoneNumberFormatting() {
@@ -322,7 +301,6 @@ function setupPhoneNumberFormatting() {
   phoneInputs.forEach(input => {
     if (input) {
       input.addEventListener('input', function(e) {
-        // Hanya biarkan angka dan hilangkan semua karakter non-digit
         this.value = this.value.replace(/[^0-9]/g, '');
       });
     }
@@ -330,4 +308,12 @@ function setupPhoneNumberFormatting() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  // Close popup saat klik di luar area popup
+  elements.successPopup.addEventListener('click', (e) => {
+    if (e.target.id === 'successPopup') {
+      elements.successPopup.style.display = 'none';
+    }
+  });
+});
