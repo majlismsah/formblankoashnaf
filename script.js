@@ -93,7 +93,7 @@ function initCropper(prefix) {
         el.cropSection.classList.remove('hidden');
         
         const cropperOptions = {
-          aspectRatio:  4 / 6,
+          aspectRatio: 4 / 6,
           viewMode: 1,
           autoCropArea: 0.8,
           responsive: true,
