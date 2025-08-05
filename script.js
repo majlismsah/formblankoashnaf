@@ -258,7 +258,7 @@ async function submitFormData(formData, btn, prefix) {
     
     // Siapkan pesan WhatsApp
     const photoLinkMessage = result.fileUrl ? `\n\n*Tautan Foto Profil*: ${result.fileUrl}` : '';
-    const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n*Nama KTP*: ${payload.nama_ktp}\n*Nama Sulthon*: ${payload.nama_sulthon}\n*Majlis*: ${payload.majlis}${photoLinkMessage}`;
+    const waMessage = `Assalamualaikum Kang, saya mau pre-order Buku Asnaf:\n\n*Nama KTP*: ${payload.nama_ktp}\n*Nama Sulthon*: ${payload.nama_sulthon}\n*Majlis*: ${payload.majlis}${photoLinkMessage}`;
     
     // Set tautan ke tombol konfirmasi di pop-up sukses
     elements.whatsappButton.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
