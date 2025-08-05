@@ -93,7 +93,7 @@ function initCropper(prefix) {
         el.cropSection.classList.remove('hidden');
         
         const cropperOptions = {
-          aspectRatio: 1,
+          aspectRatio:  4 / 6,
           viewMode: 1,
           autoCropArea: 0.8,
           responsive: true,
@@ -159,7 +159,7 @@ function initCropper(prefix) {
     
     const croppedCanvas = cropperInstance.getCroppedCanvas({
       width: 400,
-      height: 400,
+      height: 600,
       imageSmoothingEnabled: true,
       imageSmoothingQuality: 'high',
     });
