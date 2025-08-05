@@ -1,8 +1,8 @@
 // Configuration
 const CONFIG = {
   SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzUiB3eVCJu554W4HxwjdqpsPRjBUXx6pCJCEnInCO8tpV9HF3or-zfT9FgOijmsTJ8/exec",
-  ADMIN_WA_NUMBER: "6282114527948", // Ganti dengan nomor WhatsApp admin yang benar
-   MAX_FILE_SIZE: 10 * 1024 * 1024 // 10MB
+  ADMIN_WA_NUMBER: "6282114527948",
+  MAX_FILE_SIZE: 10 * 1024 * 1024 // 10MB
 };
 
 // Initialize Cropper instances
@@ -50,6 +50,7 @@ const elements = {
   successPopup: document.getElementById('successPopup'),
   whatsappButton: document.getElementById('whatsappButton')
 };
+
 function toggleSheet(show) {
   if (show) {
     elements.sheet.classList.remove('hidden');
@@ -61,6 +62,7 @@ function toggleSheet(show) {
     setTimeout(() => elements.sheet.classList.add('hidden'), 300);
   }
 }
+
 function init() {
   setupCroppers();
   setupFormSubmissions();
@@ -80,8 +82,9 @@ function initCropper(prefix) {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       
+      // Mengubah pesan alert sesuai MAX_FILE_SIZE
       if (file.size > CONFIG.MAX_FILE_SIZE) {
-        alert('Ukuran file terlalu besar. Maksimal 5MB');
+        alert(`Ukuran file terlalu besar. Maksimal ${CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`);
         el.fileInput.value = '';
         return;
       }
@@ -112,7 +115,6 @@ function initCropper(prefix) {
       reader.readAsDataURL(file);
     }
   });
-
 
   // Rotate buttons
   el.rotateLeft.addEventListener('click', function() {
@@ -247,14 +249,16 @@ async function submitFormData(formData, btn, prefix) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(payload)
     });
-
-    if (!response.ok) throw new Error(await response.text());
-
-    // Sembunyikan loading popup
-    elements.loadingPopup.style.display = 'none';
     
-    // Buat pesan WhatsApp
-    const waMessage = `const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n*Nama KTP*: ${payload.nama_ktp}\n*Nama Sulthon*: ${payload.nama_sulthon}\n*Majlis*: ${payload.majlis}${photoLinkMessage}`;`;
+    const result = await response.json(); // Menerima respons JSON
+    
+    if (result.status !== 'success') {
+      throw new Error(result.message || 'Gagal mengirim data');
+    }
+    
+    // Siapkan pesan WhatsApp
+    const photoLinkMessage = result.fileUrl ? `\n\n*Tautan Foto Profil*: ${result.fileUrl}` : '';
+    const waMessage = `Halo Admin, saya sudah pre-order Buku Asnaf:\n\n*Nama KTP*: ${payload.nama_ktp}\n*Nama Sulthon*: ${payload.nama_sulthon}\n*Majlis*: ${payload.majlis}${photoLinkMessage}`;
     
     // Set tautan ke tombol konfirmasi di pop-up sukses
     elements.whatsappButton.href = `https://wa.me/${CONFIG.ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMessage)}`;
@@ -267,12 +271,15 @@ async function submitFormData(formData, btn, prefix) {
     elements[prefix].resultSection.classList.add('hidden');
     elements[prefix].uploadSection.classList.remove('hidden');
     elements[prefix].fileInput.value = '';
+    
+    if (prefix === 'desktop' && desktopCropper) desktopCropper.destroy();
+    if (prefix === 'mobile' && mobileCropper) mobileCropper.destroy();
 
     // Sembunyikan bottom sheet jika ada
     if(prefix === 'mobile') {
       toggleSheet(false);
     }
-
+    
   } catch (error) {
     console.error('Error:', error);
     showError(error.message || 'Gagal mengirim data');
@@ -313,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.successPopup.addEventListener('click', (e) => {
     if (e.target.id === 'successPopup') {
       elements.successPopup.style.display = 'none';
+      document.body.style.overflow = ''; // Aktifkan scroll lagi
     }
   });
 });
