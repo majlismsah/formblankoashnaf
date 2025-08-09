@@ -1,374 +1,503 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Form Registrasi Jamaah MSAH 2025M 1447H</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Order Buku Asnaf</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+  <style>
+    #successPopup #whatsappButton {
+      background-color: #38b2ac !important; /* Warna teal-500 Tailwind */
+      color: #ffffff !important; /* Warna putih */
+      font-weight: 600 !important; /* Semibold */
+      transition: background-color 0.3s ease;
+    }
 
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet" />
+    #successPopup #whatsappButton:hover {
+      background-color: #319795 !important; /* Warna teal-600 Tailwind */
+    }
 
-    <style>
-        .hidden {
-            display: none;
-        }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+     .loading-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .loading-content {
+      background: rgba(255, 255, 255, 0.9);
+      color: #2C7A7B;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 300px;
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #38b2ac;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        .form-step {
-            animation: fadeIn 0.5s ease-in-out;
-        }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #1a202c;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    }
 
-        /* Styling tambahan untuk cropper */
-        .cropper-container {
-            max-width: 100%;
-            max-height: 400px;
-        }
-    </style>
+    @media (max-width: 768px) {
+      .container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-container {
+        display: none;
+      }
+
+      .book-info {
+        align-items: center;
+        text-align: center;
+      }
+
+      .book-mockup {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .book-info h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .book-info p {
+        font-size: 1rem;
+        color: #cbd5e0;
+      }
+    }
+
+    input, select {
+      outline: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    #sheet input,
+    #sheet select {
+      background-color: #2d3748;
+      color: #fff;
+    }
+
+    #sheet input::placeholder,
+    #sheet select option[disabled] {
+      color: #a0aec0;
+    }
+
+    input:focus, select:focus {
+      border-color: #38b2ac;
+      box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.3);
+    }
+
+    button {
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #2d3748;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 1000;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    #sheet.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #sheet.hidden {
+      display: none;
+    }
+
+    .sheet-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .sheet-overlay.active {
+      display: block;
+    }
+
+    /* Cropper Styles */
+    .cropper-container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    //.cropper-view-box, .cropper-face {
+      //border-radius: 50%;
+    }
+    #imagePreview, #mobileImagePreview {
+      max-height: 400px;
+    }
+    .cropped-preview {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 10px auto;
+    }
+
+    .logo {
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.15));
+    }
+
+    @media (max-width: 640px) {
+      #imagePreview, #mobileImagePreview {
+        max-height: 300px;
+      }
+      .cropper-container {
+        max-width: 100%;
+      }
+      .logo-container img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
 </head>
-
-<body class="bg-gray-100 font-sans text-gray-800">
-    <div class="max-w-3xl mx-auto p-6 bg-white shadow-xl rounded-3xl mt-6 mb-10">
-        <img src="https://github.com/majlismsah/registrasijamaah/blob/main/logomajlis.png?raw=true"
-             alt="Logo MSAH"
-             class="mx-auto h-20 w-20 rounded-full shadow-lg ring-2 ring-yellow-500 mb-4" />
-
-        <h1 class="text-2xl md:text-3xl font-bold text-center mb-1 leading-tight">
-          Form Registrasi Ulang Jamaah
-        </h1>
-        <p class="text-sm md:text-base text-center text-gray-600 font-semibold mb-6">
-          Majlis Silaturrahim Al-Asmaul Husna (MSAH)<br/>Periode Tahun 2025 / 1447H
-        </p>
-        
-        <div class="flex items-center justify-between mb-8">
-            <div id="progress-bar" class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500 transition-all duration-500 ease-in-out" style="width: 0%;"></div>
-            </div>
-        </div>
-        
-        <form id="regForm" enctype="multipart/form-data" class="space-y-6">
-            <div id="step-1" class="form-step">
-                <h2 class="text-xl font-bold text-blue-600 mb-4">👤 Identitas Pribadi</h2>
-                <div class="space-y-4">
-                    <input name="nama_ktp" class="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500" placeholder="Nama Sesuai KTP" required />
-                    <input name="ismu_sulthon" class="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500" placeholder="Ismu Sulthon" required />
-                    <select name="jenis_kelamin" id="jenis_kelamin" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Jenis Kelamin</option>
-                        <option>Laki-laki</option>
-                        <option>Perempuan</option>
-                    </select>
-                    <select name="golongan_darah" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Pilih Golongan Darah</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="AB">AB</option>
-                        <option value="O">O</option>
-                        <option value="Tidak Tahu">Tidak Tahu</option>
-                    </select>
-                    <input name="tempat_lahir" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Tempat Lahir" required />
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                        <input name="tanggal_lahir" type="date" placeholder="DD/MM/YYYY" required class="w-full p-2 border-none rounded-lg mt-1" />
-                        <p class="text-xs text-gray-500 mt-1">Untuk mengganti Tahun, Klik kiri paling atas </p>
-                    </div>
-                    <select name="pendidikan" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Pendidikan Terakhir</option>
-                        <option>SD</option><option>SMP</option><option>SMA</option>
-                        <option>D1</option><option>D2</option><option>D3</option>
-                        <option>S1</option><option>S2</option><option>S3</option>
-                    </select>
-                    <input name="no_wa" id="no_wa" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nomor Whatsapp Aktif" required />
-                    <textarea name="alamat" placeholder="Mohon isi alamat secara lengkap (Jalan, Nomor Rumah, RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten)" required rows="3" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <div class="flex justify-end mt-6">
-                    <button type="button" onclick="nextStep(1)" class="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">Lanjut</button>
-                </div>
-            </div>
-
-            <div id="step-2" class="form-step hidden">
-                <h2 class="text-xl font-bold text-blue-600 mb-4">>👪 Keluarga & Pekerjaan</h2>
-                <div class="space-y-4">
-                    <select name="status_nikah" id="status_nikah" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Status Pernikahan</option>
-                        <option>Belum Menikah</option>
-                        <option>Menikah</option>
-                        <option>Cerai Hidup</option>
-                        <option>Cerai Mati</option>
-                    </select>
-                    <select name="status_tinggal" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Status Tinggal</option>
-                        <option>Tinggal dengan Orang Tua</option>
-                        <option>Tinggal dengan Suami/Istri</option>
-                        <option>Tinggal dengan Keluarga Besar</option>
-                        <option>Rumah Milik Sendiri</option>
-                        <option>Rumah Kontrak</option>
-                        <option>Indekos</option>
-                        <option>Tinggal di Majlis</option>
-                        <option>Lainnya</option>
-                    </select>
-                    <div id="nama_pasangan_field" class="hidden">
-                        <input name="nama_pasangan" placeholder="Nama Suami/Istri" class="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500" />
-                    </div>
-                    <div id="pasangan-fields" class="hidden space-y-4">
-                        <input name="jumlah_anak" type="number" placeholder="Jumlah Anak" min="0" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-                        <input name="jumlah_keluarga" type="number" placeholder="Total Jumlah Keluarga yg Tinggal Serumah" min="1" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-                        <p class="text-xs text-gray-500 mt-1">Contoh: Suami, Istri, 2 orang anak, Ibu = 5 orang</p>
-                    </div>
-                    <div id="izin_suami_field" class="hidden mt-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <label class="block text-sm text-yellow-800 font-medium">
-                            <input type="checkbox" name="izin_suami" class="mr-2">
-                            Saya telah mendapatkan persetujuan dari Suami untuk mengikuti kegiatan di MSAH.
-                        </label>
-                    </div>
-                    <select name="pekerjaan" id="pekerjaan" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Pilih Pekerjaan</option>
-                        <option value="ASN">ASN</option>
-                        <option value="Pelajar/Mahasiswa">Pelajar/Mahasiswa</option>
-                        <option value="TNI">TNI</option>
-                        <option value="POLRI">POLRI</option>
-                        <option value="Karyawan Swasta">Karyawan Swasta</option>
-                        <option value="Pedagang">Pedagang</option>
-                        <option value="Guru">Guru</option>
-                        <option value="Wiraswasta">Wiraswasta</option>
-                        <option value="Petani">Petani</option>
-                        <option value="Peternak">Peternak</option>
-                        <option value="Driver">Driver</option>
-                        <option value="Ojol">Ojol</option>
-                        <option value="Tenaga Kesehatan">Tenaga Kesehatan</option>
-                        <option value="Freelancer">Freelancer</option>
-                        <option value="Buruh/Pekerja Harian">Buruh/Pekerja Harian</option>
-                        <option value="Pensiunan">Pensiunan</option>
-                        <option value="Tidak Bekerja">Tidak Bekerja</option>
-                        <option value="lainnya">Lainnya</option>
-                    </select>
-                    <input type="text" name="pekerjaan_lainnya" id="pekerjaan_lainnya" class="w-full p-3 border rounded-lg mt-2 hidden focus:ring-2 focus:ring-blue-500" placeholder="Tulis Pekerjaan Anda" />
-                    <input name="keahlian" placeholder="Keahlian / Skill (Opsional)" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <label class="block text-sm font-medium text-gray-700">Penghasilan Pribadi per bulan</label>
-                        <div class="relative mt-1">
-                            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">Rp</span>
-                            <input type="text" id="penghasilan" name="penghasilan" placeholder="Jumlah Penghasilan" class="w-full p-2 pl-10 border-none rounded-lg" required />
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">Mohon diisi jujur, jika tidak berpenghasilan, tulis 0</p>
-                    </div>
-                    <div id="pekerjaan_suami_field" class="hidden">
-                        <select name="pekerjaan_suami" id="pekerjaan_suami" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">Pilih Pekerjaan Suami</option>
-                            <option value="ASN">ASN</option>
-                            <option value="TNI">TNI</option>
-                            <option value="POLRI">POLRI</option>
-                            <option value="Karyawan Swasta">Karyawan Swasta</option>
-                            <option value="Pedagang">Pedagang</option>
-                            <option value="Guru">Guru</option>
-                            <option value="Wiraswasta">Wiraswasta</option>
-                            <option value="Petani">Petani</option>
-                            <option value="Peternak">Peternak</option>
-                            <option value="Driver">Driver</option>
-                            <option value="Ojol">Ojol</option>
-                            <option value="Tenaga Kesehatan">Tenaga Kesehatan</option>
-                            <option value="Freelancer">Freelancer</option>
-                            <option value="Buruh">Buruh</option>
-                            <option value="Pensiunan">Pensiunan</option>
-                            <option value="Tidak Bekerja">Tidak Bekerja</option>
-                            <option value="lainnya">Lainnya</option>
-                        </select>
-                        <input type="text" name="pekerjaan_suami_lainnya" id="pekerjaan_suami_lainnya" class="w-full p-3 border rounded-lg mt-2 hidden focus:ring-2 focus:ring-blue-500" placeholder="Sebutkan Pekerjaan Suami" />
-                    </div>
-                    <div id="penghasilan_suami_field" class="hidden">
-                        <div class="bg-gray-50 p-3 rounded-lg">
-                            <label class="block text-sm font-medium text-gray-700">Penghasilan Suami per bulan</label>
-                            <div class="relative mt-1">
-                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">Rp</span>
-                                <input type="text" id="penghasilan_suami" name="penghasilan_suami" placeholder="Jumlah Penghasilan Suami" class="w-full p-2 pl-10 border-none rounded-lg" />
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Mohon diisi jujur, jika tidak berpenghasilan, tulis 0</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-between mt-6">
-                    <button type="button" onclick="prevStep(2)" class="px-6 py-3 text-blue-600 rounded-full font-semibold transition">Kembali</button>
-                    <button type="button" onclick="nextStep(2)" class="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">Lanjut</button>
-                </div>
-            </div>
-
-            <div id="step-3" class="form-step hidden">
-                <h2 class="text-xl font-bold text-blue-600 mb-4">🤝 Komitmen & Kontak Darurat</h2>
-                <div class="space-y-4">
-                    <select name="majlis_wilayah" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Pilih Majlis Wilayah / Kabilah</option>
-                        <option>Ar-Rahman</option>
-                        <option>Ar-Rohim</option>
-                        <option>Al-Qudus</option>
-                        <option>Al-Malik</option>
-                        <option>Nurul Salikin</option>
-                        <option>Nurul Kamilah</option>
-                        <option>Nurul Hakim</option>
-                        <option>Nurul Hikmah</option>
-                        <option>Barakotaul Anbiya</option>
-                    </select>
-                    <input name="tahun_gabung" type="number" min="2000" placeholder="Tahun Kapan Anda Bergabung di MSAH" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <label class="block text-sm font-medium text-gray-700">Infaq Wajib MSAH (Pusat)</label>
-                        <select name="infaq_msah" required class="w-full p-2 border rounded-lg mt-2 focus:ring-2 focus:ring-blue-500">
-                            <option value="">Pilih</option>
-                            <option>Bersedia</option>
-                            <option>Tidak Bersedia</option>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">
-                          * Infaq wajib bulanan sebesar <strong>Rp100.000</strong> sesuai ketentuan Majlis Pusat MSAH.
-                          <br>* Disetorkan setiap tanggal <strong>28</strong> setiap bulannya.
-                        </p>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <label class="block text-sm font-medium text-gray-700">Infaq Wilayah / Kabilah</label>
-                        <select name="infaq_wilayah" required class="w-full p-2 border rounded-lg mt-2 focus:ring-2 focus:ring-blue-500">
-                            <option value="">Pilih</option>
-                            <option>Bersedia</option>
-                            <option>Tidak Bersedia</option>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">* Besaran infaq mengikuti keputusan Wilayah/Kabilah</p>
-                    </div>
-                    <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <p class="text-sm font-medium mb-2">Kesediaan Menunaikan ZISWNH</p>
-                        <label class="block text-sm">
-                            <input type="checkbox" name="komitmen_ziswnh" required class="mr-2">
-                            Saya bersedia menunaikan kewajiban tersebut di MSAH.
-                        </label>
-                    </div>
-                    <div class="mt-4">
-                        <h3 class="text-lg font-semibold border-b pb-1 mb-3">☎️ Kontak Darurat</h3>
-                        <input name="nama_kontak_darurat" class="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500" placeholder="Nama Kontak Darurat" required />
-                        <input name="hubungan_kontak_darurat" class="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500" placeholder="Hubungan (Ayah/Ibu/Saudara)" required />                        
-                        <input name="no_kontak_darurat" id="no_kontak_darurat" class="w-full p-3 border rounded-lg mt-2" placeholder="No. HP Kontak Darurat" />
-                    </div>
-                </div>
-                <div class="flex justify-between mt-6">
-                    <button type="button" onclick="prevStep(3)" class="px-6 py-3 text-blue-600 rounded-full font-semibold transition">Kembali</button>
-                    <button type="button" onclick="nextStep(3)" class="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">Lanjut</button>
-                </div>
-            </div>
-
-            <div id="step-4" class="form-step hidden">
-                <h2 class="text-xl font-bold text-blue-600 mb-4">Langkah 4: Unggah Dokumen</h2>
-                
-                <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <label class="block mb-2 font-semibold">Upload Foto KTP (Rasio 3:2)</label>
-                    <div id="ktpUploadSection">
-                        <label class="flex flex-col items-center px-4 py-6 bg-white rounded-md border-2 border-dashed border-gray-300 cursor-pointer hover:border-blue-500">
-                            <svg class="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p class="text-sm text-gray-500">
-                                <span class="font-semibold text-blue-400">Klik untuk upload</span> atau drag & drop
-                            </p>
-                            <input type="file" id="ktpFileInput" accept="image/*" class="hidden" required>
-                        </label>
-                    </div>
-                    <div id="ktpCropSection" class="hidden">
-                        <div class="mb-4">
-                            <div class="cropper-container">
-                                <img id="ktpImagePreview" class="block max-w-full">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2 justify-center mb-4">
-                            <button id="ktpRotateLeft" type="button" class="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm">↺ Rotasi Kiri</button>
-                            <button id="ktpRotateRight" type="button" class="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm">↻ Rotasi Kanan</button>
-                            <button id="ktpResetCrop" type="button" class="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm">⟲ Reset</button>
-                        </div>
-                        <div class="flex justify-between">
-                            <button id="ktpCancelCrop" type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</button>
-                            <button id="ktpSaveCrop" type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Simpan Foto</button>
-                        </div>
-                    </div>
-                    <div id="ktpResultSection" class="hidden mt-4">
-                        <p class="font-semibold mb-2">Foto KTP berhasil diunggah:</p>
-                        <div id="ktpCroppedResult" class="cropped-preview mb-2"></div>
-                        <input type="hidden" id="ktpCroppedImageData" name="ktp_file">
-                        <button id="ktpChangePhoto" type="button" class="text-sm text-blue-500 hover:underline">Ganti Foto</button>
-                    </div>
-                </div>
-
-                <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <label class="block mb-2 font-semibold">Upload Foto Profil (Pas Foto 4x6)</label>
-                    <div id="fotoUploadSection">
-                        <label class="flex flex-col items-center px-4 py-6 bg-white rounded-md border-2 border-dashed border-gray-300 cursor-pointer hover:border-blue-500">
-                            <svg class="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p class="text-sm text-gray-500">
-                                <span class="font-semibold text-blue-400">Klik untuk upload</span> atau drag & drop
-                            </p>
-                            <input type="file" id="fotoFileInput" accept="image/*" class="hidden" required>
-                        </label>
-                    </div>
-                    <div id="fotoCropSection" class="hidden">
-                        <div class="mb-4">
-                            <div class="cropper-container">
-                                <img id="fotoImagePreview" class="block max-w-full">
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2 justify-center mb-4">
-                            <button id="fotoRotateLeft" type="button" class="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm">↺ Rotasi Kiri</button>
-                            <button id="fotoRotateRight" type="button" class="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm">↻ Rotasi Kanan</button>
-                            <button id="fotoResetCrop" type="button" class="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg text-sm">⟲ Reset</button>
-                        </div>
-                        <div class="flex justify-between">
-                            <button id="fotoCancelCrop" type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</button>
-                            <button id="fotoSaveCrop" type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Simpan Foto</button>
-                        </div>
-                    </div>
-                    <div id="fotoResultSection" class="hidden mt-4">
-                        <p class="font-semibold mb-2">Foto Profil berhasil diunggah:</p>
-                        <div id="fotoCroppedResult" class="cropped-preview mb-2"></div>
-                        <input type="hidden" id="fotoCroppedImageData" name="foto_file">
-                        <button id="fotoChangePhoto" type="button" class="text-sm text-blue-500 hover:underline">Ganti Foto</button>
-                    </div>
-                </div>
-
-                <div class="mt-8 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <label class="block text-sm text-green-700 font-medium mb-1">✅ Konfirmasi Data</label>
-                    <label class="inline-flex items-start">
-                        <input type="checkbox" name="final_konfirmasi" required class="mt-1" />
-                        <span class="ml-2 text-sm leading-snug text-green-800">
-                            Saya menyatakan bahwa semua data yang saya isi adalah benar dan dapat dipertanggungjawabkan.
-                        </span>
-                    </label>
-                </div>
-                
-                <div class="flex justify-between mt-6">
-                    <button type="button" onclick="prevStep(4)" class="px-6 py-3 text-blue-600 rounded-full font-semibold transition">Kembali</button>
-                    <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-full font-semibold hover:bg-green-700 transition">Kirim Formulir</button>
-                </div>
-            </div>
-            
-            <p id="status" class="text-center text-sm text-red-600 mt-4"></p>
-        </form>
-
-        <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center animate-bounce-in-down max-w-sm w-full">
-                <div class="text-green-600 text-4xl mb-3">🤲</div>
-                <h3 class="text-xl font-bold mb-2 text-green-700">Alhamdulillah, Registrasi Berhasil!</h3>
-                <p class="text-sm text-gray-700 mb-4 leading-relaxed">
-                    Data antum/anti telah kami terima.<br />
-                    Silakan konfirmasi ke Admin Majlis melalui WhatsApp.
-                </p>
-                <button onclick="chatAdminWA()" class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition mb-2">
-                    Klik Disini untuk Konfirmasi ke Admin
-                </button>
-                <button onclick="closeModal()" class="text-sm text-gray-500 hover:underline">Tutup</button>
-            </div>
-        </div>
-
+<body>
+  <div class="container">
+    <div class="book-info p-10 flex flex-col justify-center">
+      <div class="logo-container text-center mb-6">
+        <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/logo.png" 
+             alt="Logo MSAH" 
+             class="logo w-28 h-28 mx-auto rounded-full object-cover border-[3px] border-teal-400/80 shadow-xl hover:border-teal-300">
+        <h1 class="text-3xl font-bold mt-4">📘 Pre-Order <span class="text-teal-400">Buku Asnaf</span></h1>
+      </div>
+      <p class="text-white/80 mb-6">Buku eksklusif untuk pencatatan ASHNAF jamaah. Desain elegan, siap digunakan oleh seluruh Jamaah MSAH.</p>
+      <div class="book-mockup">
+      <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/coverashnaf.png" 
+           alt="Cover Buku Asnaf" 
+           class="w-full h-full object-cover">
+      </div>
+      <div class="block md:hidden text-center mt-8">
+        <button onclick="toggleSheet(true)" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition">
+          👉 Klik untuk isi Formulir Pre-Order
+        </button>
+      </div>
     </div>
 
-    <p class="text-center text-xs text-gray-500 mt-8">
-        © 2025 Majlis Silaturrahim Al-Asmaul Husna | Developed by Munadil.
-    </p>
+    <div class="form-container p-10 hidden md:block">
+      <form id="preorderForm">
+        <h2 class="text-xl font-semibold text-center mb-6">Isi Form Pre-Order</h2>
+        
+        <div class="mb-4">
+          <label for="nama_ktp" class="block mb-1 font-medium">Nama sesuai KTP</label>
+          <input type="text" id="nama_ktp" name="nama_ktp" placeholder="Contoh : HARYANTO" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
+        </div>
+        
+        <div class="mb-4">
+          <label for="nama_sulthon" class="block mb-1 font-medium">Nama Sulthon</label>
+          <input type="text" id="nama_sulthon" name="nama_sulthon" placeholder="Contoh: AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
+        </div>
+        
+        <div class="mb-4">
+          <label for="no_wa" class="block mb-1 font-medium">No. WhatsApp</label>
+          <input type="tel" id="no_wa" name="no_wa" placeholder="Contoh: 081234567890" class="w-full p-3 rounded-md bg-gray-800 text-white" required />
+        </div>
+        
+        <div class="mb-4">
+          <label for="majlis" class="block mb-1 font-medium">Majlis Wilayah</label>
+          <select id="majlis" name="majlis" class="w-full p-3 rounded-md bg-gray-800 text-white" required>
+            <option value="" disabled selected hidden>Pilih Wilayah Majlis</option>
+            <option value="Ar-Rahman">Ar-Rahman</option>
+            <option value="Ar-Rohim">Ar-Rohim</option>
+            <option value="Al-Qudus">Al-Qudus</option>
+            <option value="Al-Malik">Al-Malik</option>
+            <option value="Nurul Salikin">Nurul Salikin</option>
+            <option value="Nurul Kamilah">Nurul Kamilah</option>
+            <option value="Nurul Hakim">Nurul Hakim</option>
+            <option value="Nurul Hikmah">Nurul Hikmah</option>
+            <option value="Barakotaul Anbiya">Barakotaul Anbiya</option>
+          </select>
+        </div>
+        
+        <div class="mb-6">
+          <label class="block mb-2 font-medium">Foto Profil Jamaah</label>
+          
+          <div id="uploadSection">
+            <label class="flex flex-col items-center px-4 py-6 bg-gray-800 rounded-md border-2 border-dashed border-gray-700 cursor-pointer hover:border-teal-500 mb-4">
+              <svg class="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              <p class="text-sm text-gray-400">
+                <span class="font-semibold text-teal-400">Klik untuk upload</span> atau drag & drop
+              </p>
+              <p class="text-xs text-gray-500 mt-1">JPEG atau PNG</p>
+              <input type="file" id="fileInput" accept="image/*" class="hidden" required>
+            </label>
+          </div>
+          
+          <div id="cropSection" class="hidden">
+            <div class="mb-4">
+              <div class="cropper-container">
+                <img id="imagePreview" class="block max-w-full">
+              </div>
+            </div>
+            
+            <div class="flex space-x-2 mb-4">
+              <button id="rotateLeft" type="button" class="px-3 py-1 bg-gray-700 text-white rounded">
+                ↺ Rotasi Kiri
+              </button>
+              <button id="rotateRight" type="button" class="px-3 py-1 bg-gray-700 text-white rounded">
+                ↻ Rotasi Kanan
+              </button>
+              <button id="resetCrop" type="button" class="px-3 py-1 bg-gray-700 text-white rounded">
+                ⟲ Reset
+              </button>
+            </div>
+            
+            <div class="flex justify-between">
+              <button id="cancelCrop" type="button" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600">
+                Batal
+              </button>
+              <button id="saveCrop" type="button" class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">
+                Simpan Foto
+              </button>
+            </div>
+          </div>
+          
+          <div id="resultSection" class="hidden mt-4">
+            <div id="croppedResult" class="mb-2"></div>
+            <input type="hidden" id="croppedImageData" name="fotoProfil">
+            <button id="changePhoto" type="button" class="text-sm text-teal-400 hover:underline">
+              Ganti Foto
+            </button>
+          </div>
+        </div>
+        <div class="mt-4 bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-6">
+          <label class="flex items-start">
+            <input 
+              type="checkbox" 
+              id="confirmPaymentDesktop" 
+              required
+              class="mt-1 mr-2 h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+            >
+            <span class="text-gray-700">
+              Saya memahami dan menyetujui untuk membayar infaq sebesar 
+              <span class="font-bold text-red-600">Rp.200.000</span> 
+              untuk pencetakan Buku Blanko Kosong Ashnaf.
+            </span>
+          </label>
+        </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script src="script.js"></script>
+        <button type="submit" class="w-full py-3 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow-lg border-2 border-teal-500 hover:border-teal-300 transition-all duration-300">
+          Kirim & Konfirmasi via WA
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="sheetOverlay" class="sheet-overlay" onclick="toggleSheet(false)"></div>
+
+  <div id="sheet" class="hidden">
+    <div class="text-center mb-4">
+      <img src="https://raw.githubusercontent.com/majlismsah/formblankoashnaf/main/logo.png" 
+           alt="Logo MSAH" 
+           class="w-20 h-20 mx-auto rounded-full mb-2 border-2 border-teal-400">
+      <h2 class="text-xl font-bold text-white">Form Pre-Order Buku Asnaf</h2>
+      <button onclick="toggleSheet(false)" class="text-sm text-gray-300 mt-1 hover:underline">Tutup</button>
+    </div>
+    <form id="preorderFormMobile">
+      <div class="mb-4">
+        <label class="block font-medium mb-1 text-white" for="namaKtpMobile">Nama KTP</label>
+        <input type="text" id="namaKtpMobile" name="nama_ktp" placeholder="Contoh: AHMAD MUNADIL" class="w-full p-3 rounded-md bg-gray-700 text-white" required />
+      </div>
+      
+      <div class="mb-4">
+        <label class="block font-medium mb-1 text-white" for="namaSulthonMobile">Nama Sulthon</label>
+        <input type="text" id="namaSulthonMobile" name="nama_sulthon" placeholder="Contoh: ABDULLAH" class="w-full p-3 rounded-md bg-gray-700 text-white" required />
+      </div>
+      
+      <div class="mb-4">
+        <label class="block font-medium mb-1 text-white" for="waMobile">No. WhatsApp</label>
+        <input type="tel" id="waMobile" name="no_wa" class="w-full p-3 rounded-md bg-gray-700 text-white" placeholder="081234567890" required />
+      </div>
+      
+      <div class="mb-4">
+        <label class="block font-medium mb-1 text-white" for="majlisMobile">Wilayah Majlis</label>
+        <select id="majlisMobile" name="majlis" class="w-full p-3 rounded-md bg-gray-700 text-white" required>
+          <option value="" disabled selected hidden>Pilih Majlis</option>
+          <option value="Ar-Rahman">Ar-Rahman</option>
+          <option value="Ar-Rohim">Ar-Rohim</option>
+          <option value="Al-Qudus">Al-Qudus</option>
+          <option value="Al-Malik">Al-Malik</option>
+          <option value="Nurul Salikin">Nurul Salikin</option>
+          <option value="Nurul Kamilah">Nurul Kamilah</option>
+          <option value="Nurul Hakim">Nurul Hakim</option>
+          <option value="Nurul Hikmah">Nurul Hikmah</option>
+          <option value="Barakotaul Anbiya">Barakotaul Anbiya</option>
+        </select>
+      </div>
+      
+      <div class="mb-6">
+        <label class="block font-medium mb-1 text-white">Foto Profil Jamaah</label>
+        
+        <div id="mobileUploadSection">
+          <label class="flex flex-col items-center px-4 py-6 bg-gray-700 rounded-md border-2 border-dashed border-gray-600 cursor-pointer hover:border-teal-500 mb-4">
+            <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <p class="text-sm text-gray-400">
+              <span class="font-semibold text-teal-400">Klik untuk upload</span>
+            </p>
+            <p class="text-xs text-gray-500 mt-1">JPEG atau PNG</p>
+            <input type="file" id="mobileFileInput" accept="image/*" class="hidden" required>
+          </label>
+        </div>
+        
+        <div id="mobileCropSection" class="hidden">
+          <div class="mb-4">
+            <div class="cropper-container">
+              <img id="mobileImagePreview" class="block max-w-full">
+            </div>
+          </div>
+          
+          <div class="flex space-x-2 mb-4">
+            <button id="mobileRotateLeft" type="button" class="px-3 py-1 bg-gray-600 text-white rounded">
+              ↺ Kiri
+            </button>
+            <button id="mobileRotateRight" type="button" class="px-3 py-1 bg-gray-600 text-white rounded">
+              ↻ Kanan
+            </button>
+            <button id="mobileResetCrop" type="button" class="px-3 py-1 bg-gray-600 text-white rounded">
+              ⟲ Reset
+            </button>
+          </div>
+          
+          <div class="flex justify-between">
+            <button id="mobileCancelCrop" type="button" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500">
+              Batal
+            </button>
+            <button id="mobileSaveCrop" type="button" class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">
+              Simpan
+            </button>
+          </div>
+        </div>
+        
+        <div id="mobileResultSection" class="hidden mt-4">
+          <div id="mobileCroppedResult" class="mb-2"></div>
+          <input type="hidden" id="mobileCroppedImageData" name="fotoProfil">
+          <button id="mobileChangePhoto" type="button" class="text-sm text-teal-400 hover:underline">
+            Ganti Foto
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-6">
+        <label class="flex items-start">
+          <input 
+            type="checkbox" 
+            id="confirmPaymentMobile" 
+            required
+            class="mt-1 mr-2 h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+          >
+          <span class="text-gray-700">
+            Saya memahami dan menyetujui untuk membayar infaq sebesar 
+            <span class="font-bold text-red-600">Rp.200.000</span> 
+            untuk pencetakan Buku Blanko Kosong Ashnaf
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="bg-teal-500 hover:bg-teal-600 w-full text-white py-3 rounded-md font-bold shadow-lg border-2 border-teal-500 hover:border-teal-300 transition-all duration-300">
+        Kirim & Konfirmasi via WA ke Admin
+      </button>
+    </form>
+  </div>
+
+  <div id="loadingPopup" class="loading-popup" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="font-semibold text-teal-700">Data sedang diproses...</p>
+    </div>
+  </div>
+
+  <div id="successPopup" class="loading-popup" style="display: none;">
+    <div class="loading-content bg-white shadow-xl rounded-lg p-6 text-center">
+      <svg class="mx-auto w-16 h-16 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">Pendaftaran Sukses!</h3>
+      <p class="text-gray-600 mb-6">Terima kasih, data Anda telah berhasil dikirim. Silakan konfirmasi ke admin.</p>
+      <a id="whatsappButton" href="#" target="_blank" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-md transition-colors inline-block">
+        Konfirmasi ke Admin via WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
